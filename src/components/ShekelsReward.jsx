@@ -1,6 +1,13 @@
+import { useEffect } from "react";
 import "./ShekelsReward.css";
 
 export default function ShekelsReward({ shekels, word, meaning, onContinue }) {
+  useEffect(() => {
+    const audio = new Audio(`/sounds/reward_0${Math.ceil(Math.random() * 3)}.mp3`);
+    audio.volume = 0.7;
+    audio.play().catch(() => {});
+  }, []);
+
   return (
     <div className="reward-root anim-fade-in">
       <div className="reward-ornament" />

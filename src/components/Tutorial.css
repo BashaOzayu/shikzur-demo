@@ -56,6 +56,43 @@
   justify-content: flex-end;
 }
 
+.tutorial-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 16px;
+  gap: 12px;
+}
+
+.tutorial-btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(168,124,69,0.5);
+  color: var(--bronze-light);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tutorial-btn-secondary:hover {
+  border-color: var(--bronze-glow);
+  color: var(--ivory);
+}
+
+.tutorial-btn-secondary:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  border-color: rgba(168,124,69,0.2);
+}
+
+.tutorial-nav .title-btn {
+  padding: 8px 20px;
+  font-size: 0.85rem;
+}
+
 /* Forms chart (slide 8) */
 .forms-chart {
   width: 100%;

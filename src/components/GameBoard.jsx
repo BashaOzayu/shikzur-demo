@@ -67,6 +67,11 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
       // Shake and return
       setShaking(tileId);
       setTimeout(() => setShaking(null), 500);
+
+      const mistakeAudio = new Audio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`);
+      mistakeAudio.volume = 0.7;
+      mistakeAudio.play().catch(() => {});
+
       setDragging(null);
       return;
     }

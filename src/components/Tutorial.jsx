@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./Tutorial.css";
 
 const slides = [
@@ -66,13 +66,51 @@ const slides = [
 ];
 
 export default function Tutorial({ onComplete }) {
-  const [index, setIndex] = useState(0);
-  const slide = slides[index];
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slide = slides[currentSlide];
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
+    const src = `/sounds/tutorial_0${currentSlide + 1}.mp3`;
+
+    // Only attempt playback if the file exists (slides 6–8 may not exist yet).
+    fetch(src, { method: "HEAD" })
+      .then((res) => {
+        if (!res.ok) return;
+        const audio = new Audio(src);
+        audioRef.current = audio;
+        audio.play().catch(() => {});
+      })
+      .catch(() => {});
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [currentSlide]);
+
+  function handleReplay() {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    }
+  }
 
   function handleContinue() {
-    if (index < slides.length - 1) {
-      setIndex((i) => i + 1);
+    if (currentSlide < slides.length - 1) {
+      setCurrentSlide((s) => s + 1);
     } else {
+      // Cleanup audio on tutorial end
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
       onComplete?.();
     }
   }
@@ -83,7 +121,7 @@ export default function Tutorial({ onComplete }) {
         <h2 className="tutorial-title">{slide.title}</h2>
 
         <div className="tutorial-visual">
-          {index === 7 ? (
+          {currentSlide === 7 ? (
             <div className="forms-chart">
               <div className="forms-head">
                 <span>Isolated</span>
@@ -112,7 +150,17 @@ export default function Tutorial({ onComplete }) {
           </div>
         </div>
 
-        <div className="tutorial-actions">
+        <div className="tutorial-nav">
+          <button
+            className="tutorial-btn-secondary"
+            onClick={() => setCurrentSlide((s) => s - 1)}
+            disabled={currentSlide === 0}
+          >
+            ← Back
+          </button>
+          <button className="tutorial-btn-secondary" onClick={handleReplay}>
+            ↺ Replay
+          </button>
           <button className="title-btn" onClick={handleContinue}>
             Continue →
           </button>
