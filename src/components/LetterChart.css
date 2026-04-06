@@ -1,0 +1,93 @@
+.letterchart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 199;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.letterchart-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.letterchart-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 320px;
+  z-index: 200;
+  background: linear-gradient(160deg, #0d0d1a 0%, #1a1a4e 100%);
+  border-left: 1px solid rgba(168,124,69,0.4);
+  transform: translateX(100%);
+  transition: transform 0.35s ease;
+  display: flex;
+  flex-direction: column;
+}
+.letterchart-panel.open {
+  transform: translateX(0);
+}
+
+.letterchart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 12px 8px 14px;
+}
+.letterchart-title {
+  font-family: "Cormorant Garamond", serif;
+  color: var(--ivory);
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.letterchart-close {
+  background: transparent;
+  border: none;
+  color: var(--bronze);
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.letterchart-table {
+  overflow-y: auto;
+  padding: 8px 12px 14px;
+}
+.table-head {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(4, 1fr);
+  color: var(--bronze);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(168,124,69,0.15);
+}
+.table-body {
+  display: flex;
+  flex-direction: column;
+}
+.table-row {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(4, 1fr);
+  align-items: center;
+  padding: 6px 4px;
+  border-bottom: 1px solid rgba(168,124,69,0.15);
+}
+.table-row.odd {
+  background: rgba(255,255,255,0.02);
+}
+.cell-name {
+  color: var(--parchment);
+  font-size: 0.85rem;
+}
+.cell-form {
+  color: var(--ivory);
+  font-size: 1.3rem;
+  text-align: center;
+  direction: rtl;
+  padding: 8px 4px;
+}
+

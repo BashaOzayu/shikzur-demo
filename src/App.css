@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap');
+
+:root {
+  --indigo:      #1a1a4e;
+  --indigo-mid:  #22235c;
+  --indigo-light:#2e2f7a;
+  --purple:      #3d2a5e;
+  --bronze:      #7c5c2e;
+  --bronze-light:#a67c45;
+  --bronze-glow: #c9973a;
+  --parchment:   #e8dfc8;
+  --parchment-dark: #d4c9a8;
+  --ink:         #0d0d1a;
+  --ivory:       #f2ead6;
+  --sand:        #c8b87a;
+  --palm:        #3a5c3a;
+  --text-primary: #e8dfc8;
+  --text-dim:    #9b9070;
+  --slot-empty:  rgba(200, 184, 122, 0.15);
+  --slot-filled: rgba(169, 124, 69, 0.25);
+  --slot-border: rgba(168, 124, 69, 0.5);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  width: 100%; height: 100%;
+  background: var(--indigo);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+.app-root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(61,42,94,0.6) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(26,26,78,0.8) 0%, transparent 60%),
+    linear-gradient(160deg, #0d0d1a 0%, #1a1a4e 50%, #120d2a 100%);
+}
+
+/* Ambient star texture */
+.app-root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 15% 25%, rgba(232,223,200,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 42% 10%, rgba(232,223,200,0.25) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 35%, rgba(232,223,200,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 88% 60%, rgba(232,223,200,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 75%, rgba(232,223,200,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 85%, rgba(232,223,200,0.2) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Sand drift at bottom */
+.app-root::after {
+  content: '';
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(to top, rgba(200,184,122,0.08) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Utility */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { opacity: 0.6; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+@keyframes dustDrift {
+  0%   { transform: translateX(0) translateY(0); opacity: 0; }
+  20%  { opacity: 0.4; }
+  100% { transform: translateX(60px) translateY(-30px); opacity: 0; }
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-6px); }
+  40%  { transform: translateX(6px); }
+  60%  { transform: translateX(-4px); }
+  80%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes correctGlow {
+  0%   { box-shadow: 0 0 0px rgba(201,151,58,0); }
+  50%  { box-shadow: 0 0 20px rgba(201,151,58,0.7); }
+  100% { box-shadow: 0 0 8px rgba(201,151,58,0.3); }
+}
+
+@keyframes candleFlicker {
+  0%, 100% { opacity: 0.85; transform: scaleY(1) scaleX(1); }
+  25%       { opacity: 1;    transform: scaleY(1.05) scaleX(0.97); }
+  75%       { opacity: 0.78; transform: scaleY(0.97) scaleX(1.02); }
+}
+
+@keyframes complete {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}

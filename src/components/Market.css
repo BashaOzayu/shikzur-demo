@@ -1,0 +1,115 @@
+.market-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 70vh;
+  background-image: url(/tiles/marketplace.png);
+  background-size: cover;
+  background-position: center;
+}
+.market-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 8, 25, 0.72);
+}
+
+.market-content {
+  position: relative;
+  z-index: 1;
+  padding: 20px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.market-title {
+  font-family: "Cormorant Garamond", serif;
+  color: var(--ivory);
+  text-align: center;
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+}
+
+.market-shekels {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  color: var(--bronze-glow);
+  letter-spacing: 0.08em;
+}
+.market-shekels .coin { margin-right: 6px; }
+
+.market-narration {
+  align-self: center;
+  background: rgba(13,13,26,0.75);
+  color: var(--parchment);
+  font-style: italic;
+  font-size: 0.9rem;
+  padding: 10px 16px;
+  border-radius: 2px;
+}
+.market-narration .muted { opacity: 0.7; }
+
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.market-card {
+  background: var(--indigo);
+  border: 1px solid var(--bronze);
+  border-radius: 2px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.market-card:hover {
+  transform: translateY(-3px);
+}
+.market-card.purchased {
+  opacity: 0.5;
+}
+
+.market-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.market-item-name {
+  color: var(--ivory);
+  font-size: 1.05rem;
+}
+.market-item-cost {
+  color: var(--bronze);
+}
+.market-item-cost .coin { margin-right: 4px; }
+.market-item-desc {
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.market-buy {
+  align-self: flex-end;
+  padding: 8px 12px;
+  border: 1px solid var(--bronze);
+  background: transparent;
+  color: var(--parchment);
+  border-radius: 2px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.market-buy.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.market-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+

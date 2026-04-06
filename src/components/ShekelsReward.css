@@ -1,0 +1,48 @@
+.reward-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 24px 16px;
+  animation: fadeIn 0.6s ease both;
+}
+
+.reward-ornament {
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--bronze) 30%, var(--bronze) 70%, transparent);
+  opacity: 0.5;
+  margin-bottom: 6px;
+}
+
+.reward-earned {
+  color: var(--bronze-glow);
+  font-style: italic;
+  letter-spacing: 0.06em;
+  font-size: 1.1rem;
+}
+
+.reward-arabic {
+  color: var(--ivory);
+  font-size: 3rem;
+  text-shadow: 0 0 24px rgba(201,151,58,0.25);
+  margin-top: 6px;
+}
+
+.reward-meaning {
+  color: var(--parchment);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.reward-total {
+  color: var(--bronze);
+  letter-spacing: 0.08em;
+  margin: 10px 0 14px;
+}
+
+.reward-total .coin {
+  margin-right: 6px;
+}
+

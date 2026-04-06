@@ -1,0 +1,175 @@
+.game-board {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
+  padding: 20px 16px;
+  animation: fadeIn 0.8s ease both;
+}
+
+/* Level dots */
+.level-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.level-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.level-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--bronze);
+  background: transparent;
+  transition: background 0.4s;
+}
+
+.level-dot.active {
+  background: var(--bronze-glow);
+  box-shadow: 0 0 8px rgba(201,151,58,0.6);
+}
+
+.level-dot.done {
+  background: var(--bronze);
+}
+
+.level-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* Fragment card — parchment feel */
+.fragment-card {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 24px 28px 18px;
+  text-align: center;
+  position: relative;
+  transition: all 0.6s ease;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  min-height: 220px;
+}
+
+.fragment-card.fragment-complete {
+  animation: complete 0.6s ease;
+  border-color: rgba(201,151,58,0.7);
+  box-shadow: 0 0 30px rgba(201,151,58,0.2), inset 0 0 20px rgba(201,151,58,0.04);
+}
+
+.fragment-ornament {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--bronze) 30%, var(--bronze) 70%, transparent);
+  opacity: 0.4;
+}
+.fragment-ornament.top { top: 8px; }
+.fragment-ornament.bottom { bottom: 8px; }
+
+.fragment-target {
+  margin-bottom: 10px;
+}
+
+.fragment-arabic {
+  font-size: 3.2rem;
+  line-height: 1.2;
+  color: #1a0a00;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  direction: rtl;
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  width: 100%;
+  display: block;
+  margin-top: 60px;
+}
+
+.fragment-romanized {
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  color: var(--ivory);
+  text-transform: lowercase;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+}
+
+.fragment-hint {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--parchment);
+  line-height: 1.5;
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.fragment-meta {
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* RTL instruction */
+.rtl-instruction {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: rgba(155,144,112,0.5);
+  text-transform: uppercase;
+}
+
+/* Touch ghost */
+.touch-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.85;
+  transform: scale(1.1);
+}
+
+/* Completion overlay */
+.completion-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: fadeIn 0.5s ease both;
+}
+
+.completion-word {
+  font-size: 1.4rem;
+  color: var(--bronze-glow);
+  font-style: italic;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 20px rgba(201,151,58,0.5);
+}
+
+.completion-sub {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.fragment-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 13, 40, 0.35);
+  border-radius: 2px;
+}

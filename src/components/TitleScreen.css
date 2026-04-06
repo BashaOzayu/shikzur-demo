@@ -1,0 +1,180 @@
+.title-screen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-image: url(/tiles/library_title.png);
+  background-size: cover;
+  background-position: center;
+  animation: fadeIn 1.4s ease both;
+  z-index: 1;
+}
+
+.title-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 8, 25, 0.55) 0%,
+    rgba(10, 8, 25, 0.35) 40%,
+    rgba(10, 8, 25, 0.75) 100%
+  );
+  z-index: 0;
+}
+
+.title-screen > * {
+  position: relative;
+  z-index: 1;
+}
+
+.title-candle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.candle-flame {
+  width: 14px;
+  height: 22px;
+  background: radial-gradient(ellipse at 50% 80%, #f5c842 0%, #e87c1e 60%, transparent 100%);
+  border-radius: 50% 50% 30% 30%;
+  animation: candleFlicker 2.4s ease-in-out infinite;
+  filter: blur(1px);
+  box-shadow: 0 0 12px 4px rgba(232,124,30,0.5), 0 0 30px 8px rgba(245,200,66,0.2);
+}
+
+.candle-body {
+  width: 18px;
+  height: 48px;
+  background: linear-gradient(to bottom, var(--ivory) 0%, var(--parchment-dark) 100%);
+  border-radius: 2px;
+  border: 1px solid rgba(168,124,69,0.4);
+}
+
+.title-eyebrow {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bronze-light);
+  margin-bottom: 8px;
+}
+
+.title-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  max-width: 560px;
+  width: 90%;
+  padding: 40px 32px;
+  background: rgba(10, 8, 25, 0.45);
+  border: 1px solid rgba(168, 124, 69, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+.title-arabic-main {
+  font-size: 3.8rem;
+  font-weight: 400;
+  color: var(--ivory);
+  text-shadow: 0 0 40px rgba(201,151,58,0.5), 0 2px 12px rgba(0,0,0,0.8);
+  direction: rtl;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.title-english-main {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--bronze-light);
+  letter-spacing: 0.12em;
+  margin-bottom: 20px;
+}
+
+.title-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--bronze) 40%, var(--bronze) 60%, transparent);
+  opacity: 0.5;
+}
+
+.divider-mark {
+  color: var(--bronze-light);
+  font-size: 0.7rem;
+}
+
+.title-intro {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--parchment);
+  margin-bottom: 14px;
+  font-style: italic;
+}
+
+.title-instruction {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-dim);
+  margin-bottom: 28px;
+}
+
+.title-instruction strong {
+  color: var(--bronze-light);
+  font-weight: 600;
+}
+
+.title-btn {
+  background: transparent;
+  border: 1px solid var(--bronze-light);
+  color: var(--parchment);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  padding: 12px 36px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.title-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(201,151,58,0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.title-btn:hover {
+  border-color: var(--bronze-glow);
+  color: var(--ivory);
+  box-shadow: 0 0 20px rgba(201,151,58,0.25), inset 0 0 20px rgba(201,151,58,0.05);
+}
+
+.title-btn:hover::before { opacity: 1; }
+
+.title-footer {
+  margin-top: 28px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  color: rgba(155,144,112,0.4);
+  text-transform: uppercase;
+}
