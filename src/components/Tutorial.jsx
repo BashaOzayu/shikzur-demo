@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./Tutorial.css";
 
 const slides = [
@@ -65,41 +65,67 @@ const slides = [
   },
 ];
 
-export default function Tutorial({ onComplete }) {
+export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const slide = slides[currentSlide];
   const audioRef = useRef(null);
+  const unlockedRef = useRef(false);
+  const sfxVolumeRef = useRef(sfxVolume);
+  sfxVolumeRef.current = sfxVolume;
 
-  useEffect(() => {
+  function unlockAudio() {
+    if (unlockedRef.current) return;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    ctx.resume().then(() => {
+      unlockedRef.current = true;
+    });
+  }
+
+  const playSlideAudio = useCallback((slideIndex) => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
-
-    const src = `/sounds/tutorial_0${currentSlide + 1}.mp3`;
-
-    // Only attempt playback if the file exists (slides 6–8 may not exist yet).
-    fetch(src, { method: "HEAD" })
-      .then((res) => {
-        if (!res.ok) return;
-        const audio = new Audio(src);
-        audioRef.current = audio;
+    if (sfxMuted) return;
+    const audio = new Audio(`/sounds/tutorial_0${slideIndex + 1}.mp3`);
+    audio.volume = sfxVolumeRef.current ?? 0.7;
+    audioRef.current = audio;
+    audio.play().catch(() => {
+      const playOnTouch = () => {
         audio.play().catch(() => {});
-      })
-      .catch(() => {});
+        document.removeEventListener("touchstart", playOnTouch);
+      };
+      document.addEventListener("touchstart", playOnTouch, { once: true });
+    });
+  }, [sfxMuted]);
 
+  useEffect(() => {
+    playSlideAudio(currentSlide);
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
       }
     };
-  }, [currentSlide]);
+  }, [currentSlide, playSlideAudio]);
+
+  useEffect(() => {
+    if (!audioRef.current || sfxMuted) return;
+    audioRef.current.volume = sfxVolume ?? 0.7;
+  }, [sfxVolume, sfxMuted]);
 
   function handleReplay() {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
-    }
+    if (sfxMuted || !audioRef.current) return;
+    audioRef.current.volume = sfxVolume ?? 0.7;
+    audioRef.current.currentTime = 0;
+    audioRef.current.play().catch(() => {
+      const playOnTouch = () => {
+        audioRef.current?.play().catch(() => {});
+        document.removeEventListener("touchstart", playOnTouch);
+      };
+      document.addEventListener("touchstart", playOnTouch, { once: true });
+    });
   }
 
   function handleContinue() {
@@ -116,7 +142,7 @@ export default function Tutorial({ onComplete }) {
   }
 
   return (
-    <div className="tutorial-root">
+    <div className="tutorial-root" style={{ touchAction: "none" }}>
       <div className="tutorial-slide anim-fade-in">
         <h2 className="tutorial-title">{slide.title}</h2>
 
@@ -153,15 +179,30 @@ export default function Tutorial({ onComplete }) {
         <div className="tutorial-nav">
           <button
             className="tutorial-btn-secondary"
-            onClick={() => setCurrentSlide((s) => s - 1)}
+            onClick={() => {
+              unlockAudio();
+              setCurrentSlide((s) => s - 1);
+            }}
             disabled={currentSlide === 0}
           >
             ← Back
           </button>
-          <button className="tutorial-btn-secondary" onClick={handleReplay}>
+          <button
+            className="tutorial-btn-secondary"
+            onClick={() => {
+              unlockAudio();
+              handleReplay();
+            }}
+          >
             ↺ Replay
           </button>
-          <button className="title-btn" onClick={handleContinue}>
+          <button
+            className="title-btn"
+            onClick={() => {
+              unlockAudio();
+              handleContinue();
+            }}
+          >
             Continue →
           </button>
         </div>

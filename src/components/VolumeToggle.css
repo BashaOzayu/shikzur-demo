@@ -1,21 +1,50 @@
-.volume-toggle {
+.volume-panel {
   position: fixed;
   top: 16px;
   right: 16px;
   z-index: 150;
-  width: 36px;
-  height: 36px;
-  border-radius: 2px;
-  background: rgba(13,13,26,0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(13,13,26,0.75);
   border: 1px solid rgba(168,124,69,0.25);
-  color: var(--ivory);
-  font-size: 1rem;
+  padding: 8px 12px;
+  border-radius: 2px;
+}
+
+.volume-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.volume-btn {
+  background: transparent;
+  border: none;
+  color: var(--bronze-light);
+  font-size: 0.9rem;
   cursor: pointer;
+  padding: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80px;
+  height: 3px;
+  background: rgba(168,124,69,0.3);
   outline: none;
-  transition: all 0.2s ease;
+  border-radius: 2px;
 }
 
-.volume-toggle:hover {
-  border-color: rgba(201,151,58,0.6);
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bronze-light);
+  cursor: pointer;
 }
-

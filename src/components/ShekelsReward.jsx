@@ -1,12 +1,19 @@
 import { useEffect } from "react";
 import "./ShekelsReward.css";
 
-export default function ShekelsReward({ shekels, word, meaning, onContinue }) {
+export default function ShekelsReward({ shekels, word, meaning, onContinue, sfxMuted, sfxVolume }) {
   useEffect(() => {
+    if (sfxMuted) return;
     const audio = new Audio(`/sounds/reward_0${Math.ceil(Math.random() * 3)}.mp3`);
-    audio.volume = 0.7;
-    audio.play().catch(() => {});
-  }, []);
+    audio.volume = sfxVolume ?? 0.7;
+    audio.play().catch(() => {
+      const playOnTouch = () => {
+        audio.play().catch(() => {});
+        document.removeEventListener("touchstart", playOnTouch);
+      };
+      document.addEventListener("touchstart", playOnTouch, { once: true });
+    });
+  }, [sfxMuted, sfxVolume]);
 
   return (
     <div className="reward-root anim-fade-in">

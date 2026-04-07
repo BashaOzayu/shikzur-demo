@@ -16,10 +16,13 @@ export default function App() {
   const [levelIndex, setLevelIndex] = useState(0);
   const [shekels, setShekels] = useState(0);
   const [gold, setGold] = useState(0);
-  const [muted, setMuted] = useState(false);
+  const [musicMuted, setMusicMuted] = useState(false);
+  const [sfxMuted, setSfxMuted] = useState(false);
+  const [musicVolume, setMusicVolume] = useState(0.35);
+  const [sfxVolume, setSfxVolume] = useState(0.7);
 
   const currentFragment = fragments[levelIndex];
-  useBackgroundMusic("/sounds/oudmusic.mp3", muted);
+  useBackgroundMusic("/sounds/oudmusic.mp3", musicMuted, musicVolume);
 
   function handleLevelComplete() {
     setShekels((s) => s + 10);
@@ -37,12 +40,23 @@ export default function App() {
 
   return (
     <div className="app-root">
-      <VolumeToggle muted={muted} onToggle={() => setMuted((m) => !m)} />
+      <VolumeToggle
+        musicMuted={musicMuted}
+        sfxMuted={sfxMuted}
+        onMusicToggle={() => setMusicMuted((m) => !m)}
+        onSfxToggle={() => setSfxMuted((s) => !s)}
+        onMusicVolume={setMusicVolume}
+        onSfxVolume={setSfxVolume}
+      />
       {screen !== "tutorial" && screen !== "title" && (
         <ShekelsHUD silver={shekels} gold={gold} />
       )}
       {screen === "tutorial" && (
-        <Tutorial onComplete={() => setScreen("game")} />
+        <Tutorial
+          onComplete={() => setScreen("game")}
+          sfxMuted={sfxMuted}
+          sfxVolume={sfxVolume}
+        />
       )}
       {screen === "title" && (
         <TitleScreen onStart={() => setScreen("tutorial")} />
@@ -53,7 +67,8 @@ export default function App() {
           levelIndex={levelIndex}
           totalLevels={fragments.length}
           onComplete={handleLevelComplete}
-          muted={muted}
+          sfxMuted={sfxMuted}
+          sfxVolume={sfxVolume}
         />
       )}
       {screen === "reward" && (
@@ -62,6 +77,8 @@ export default function App() {
           word={currentFragment.word}
           meaning={currentFragment.meaning}
           onContinue={handleRewardContinue}
+          sfxMuted={sfxMuted}
+          sfxVolume={sfxVolume}
         />
       )}
       {screen === "market" && (

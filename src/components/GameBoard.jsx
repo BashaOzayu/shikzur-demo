@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import TileBank from "./TileBank";
 import DropZone from "./DropZone";
 import "./GameBoard.css";
@@ -14,13 +14,13 @@ function shuffle(arr) {
   return a;
 }
 
-export default function GameBoard({ fragment, levelIndex, totalLevels, onComplete, muted }) {
+export default function GameBoard({ fragment, levelIndex, totalLevels, onComplete, sfxMuted, sfxVolume }) {
   const [slots, setSlots] = useState([]);         // array of tile|null per slot
   const [bankTiles, setBankTiles] = useState([]); // tiles still in bank
   const [shaking, setShaking] = useState(null);   // tile id currently shaking
   const [completed, setCompleted] = useState(false);
   const [dragging, setDragging] = useState(null); // { tileId, source: 'bank'|slotIndex }
-  const playTileSound = useTileSound("/sounds/tilesound.mp3", muted);
+  const playTileSound = useTileSound("/sounds/tilesound.mp3", sfxMuted, sfxVolume);
   const [chartOpen, setChartOpen] = useState(false);
 
   // Reset state when fragment changes
@@ -68,9 +68,11 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
       setShaking(tileId);
       setTimeout(() => setShaking(null), 500);
 
-      const mistakeAudio = new Audio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`);
-      mistakeAudio.volume = 0.7;
-      mistakeAudio.play().catch(() => {});
+      if (!sfxMuted) {
+        const mistakeAudio = new Audio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`);
+        mistakeAudio.volume = sfxVolume;
+        mistakeAudio.play().catch(() => {});
+      }
 
       setDragging(null);
       return;
@@ -121,44 +123,76 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
 
   // Touch drag state
   const [touchDrag, setTouchDrag] = useState(null);
+  const boardRef = useRef(null);
+  const touchDragRef = useRef(null);
+  const dropApiRef = useRef({
+    handleDropOnSlot: () => {},
+    handleDropOnBank: () => {},
+    setDragging: () => {},
+  });
+
+  touchDragRef.current = touchDrag;
+  dropApiRef.current = {
+    handleDropOnSlot,
+    handleDropOnBank,
+    setDragging,
+  };
+
+  useEffect(() => {
+    const el = boardRef.current;
+    if (!el) return;
+    const onMove = (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (!touch) return;
+      setTouchDrag((prev) =>
+        prev ? { ...prev, x: touch.clientX, y: touch.clientY } : prev
+      );
+    };
+    const onEnd = (e) => {
+      e.preventDefault();
+      const d = touchDragRef.current;
+      if (!d) return;
+      const { handleDropOnSlot: dropSlot, handleDropOnBank: dropBank, setDragging } =
+        dropApiRef.current;
+      const hit = document.elementFromPoint(d.x, d.y);
+      const slotEl = hit?.closest("[data-slot-index]");
+      const bankEl = hit?.closest("[data-bank]");
+      if (slotEl) {
+        dropSlot(parseInt(slotEl.dataset.slotIndex, 10));
+      } else if (bankEl) {
+        dropBank();
+      } else {
+        setDragging(null);
+      }
+      setTouchDrag(null);
+    };
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd, { passive: false });
+    el.addEventListener("touchcancel", onEnd, { passive: false });
+    return () => {
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+      el.removeEventListener("touchcancel", onEnd);
+    };
+  }, []);
 
   function handleTouchStart(e, tileId, source) {
+    e.preventDefault();
     const touch = e.touches[0];
     setTouchDrag({ tileId, source, x: touch.clientX, y: touch.clientY });
     setDragging({ tileId, source });
-  }
-
-  function handleTouchMove(e) {
-    if (!touchDrag) return;
-    const touch = e.touches[0];
-    setTouchDrag((d) => ({ ...d, x: touch.clientX, y: touch.clientY }));
-  }
-
-  function handleTouchEnd(e) {
-    if (!touchDrag) return;
-    // Find element under finger
-    const el = document.elementFromPoint(touchDrag.x, touchDrag.y);
-    const slotEl = el?.closest("[data-slot-index]");
-    const bankEl = el?.closest("[data-bank]");
-
-    if (slotEl) {
-      handleDropOnSlot(parseInt(slotEl.dataset.slotIndex));
-    } else if (bankEl) {
-      handleDropOnBank();
-    } else {
-      setDragging(null);
-    }
-    setTouchDrag(null);
   }
 
   const levelLabel = `Fragment ${levelIndex + 1} of ${totalLevels}`;
 
   return (
     <div
+      ref={boardRef}
       className="game-board"
       onMouseUp={() => setDragging(null)}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      onTouchStart={(e) => e.stopPropagation()}
+      style={{ touchAction: "none" }}
     >
       <button
         aria-label="Open letter reference"
@@ -183,7 +217,15 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
       {touchDrag && dragging && (
         <div
           className="touch-ghost"
-          style={{ left: touchDrag.x - 40, top: touchDrag.y - 40 }}
+          style={{
+            position: "fixed",
+            left: touchDrag.x - 40,
+            top: touchDrag.y - 40,
+            pointerEvents: "none",
+            zIndex: 1000,
+            opacity: 0.85,
+            transform: "scale(1.1)",
+          }}
         >
           <img
             src={`/tiles/${
