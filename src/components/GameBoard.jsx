@@ -142,30 +142,10 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
     const el = boardRef.current;
     if (!el) return;
     const onMove = (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      if (!touch) return;
-      setTouchDrag((prev) =>
-        prev ? { ...prev, x: touch.clientX, y: touch.clientY } : prev
-      );
+      handleTouchMove(e);
     };
     const onEnd = (e) => {
-      e.preventDefault();
-      const d = touchDragRef.current;
-      if (!d) return;
-      const { handleDropOnSlot: dropSlot, handleDropOnBank: dropBank, setDragging } =
-        dropApiRef.current;
-      const hit = document.elementFromPoint(d.x, d.y);
-      const slotEl = hit?.closest("[data-slot-index]");
-      const bankEl = hit?.closest("[data-bank]");
-      if (slotEl) {
-        dropSlot(parseInt(slotEl.dataset.slotIndex, 10));
-      } else if (bankEl) {
-        dropBank();
-      } else {
-        setDragging(null);
-      }
-      setTouchDrag(null);
+      handleTouchEnd(e);
     };
     el.addEventListener("touchmove", onMove, { passive: false });
     el.addEventListener("touchend", onEnd, { passive: false });
@@ -180,8 +160,47 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
   function handleTouchStart(e, tileId, source) {
     e.preventDefault();
     const touch = e.touches[0];
-    setTouchDrag({ tileId, source, x: touch.clientX, y: touch.clientY });
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetX = touch.clientX - rect.left - rect.width / 2;
+    const offsetY = touch.clientY - rect.top - rect.height / 2;
+    setTouchDrag({
+      tileId,
+      source,
+      x: touch.clientX,
+      y: touch.clientY,
+      offsetX,
+      offsetY,
+    });
     setDragging({ tileId, source });
+  }
+
+  function handleTouchMove(e) {
+    e.preventDefault();
+    if (!touchDragRef.current) return;
+    const touch = e.touches[0];
+    setTouchDrag((d) => ({
+      ...d,
+      x: touch.clientX,
+      y: touch.clientY,
+    }));
+  }
+
+  function handleTouchEnd(e) {
+    e.preventDefault();
+    const d = touchDragRef.current;
+    if (!d) return;
+    const el = document.elementFromPoint(d.x, d.y);
+    const slotEl = el?.closest("[data-slot-index]");
+    const bankEl = el?.closest("[data-bank]");
+
+    if (slotEl) {
+      dropApiRef.current.handleDropOnSlot(parseInt(slotEl.dataset.slotIndex, 10));
+    } else if (bankEl) {
+      dropApiRef.current.handleDropOnBank();
+    } else {
+      dropApiRef.current.setDragging(null);
+    }
+    setTouchDrag(null);
   }
 
   const levelLabel = `Fragment ${levelIndex + 1} of ${totalLevels}`;
@@ -219,8 +238,8 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
           className="touch-ghost"
           style={{
             position: "fixed",
-            left: touchDrag.x - 40,
-            top: touchDrag.y - 40,
+            left: touchDrag.x - 40 - (touchDrag.offsetX ?? 0),
+            top: touchDrag.y - 40 - (touchDrag.offsetY ?? 0),
             pointerEvents: "none",
             zIndex: 1000,
             opacity: 0.85,
