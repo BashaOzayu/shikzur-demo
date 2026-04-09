@@ -4,38 +4,6 @@
 export const fragments = [
   {
     id: 1,
-    word: "سَلَام",
-    romanization: "salaam",
-    meaning: "peace",
-    hint: "A greeting carried across centuries of scholarship",
-    fragment: "fragment_1.png",
-    tiles: [
-      { id: "seen",  file: "tile_sin.png",  letter: "س", name: "seen", position: 0 },
-      { id: "lam",   file: "tile_lam.png",  letter: "ل", name: "lam", position: 1 },
-      { id: "alif",  file: "tile_alif.png", letter: "ا", name: "alif", position: 2 },
-      { id: "mim",   file: "tile_mim.png",  letter: "م", name: "meem", position: 3 },
-    ],
-    decoys: [],
-  },
-  {
-    id: 2,
-    word: "دَرَسَ",
-    romanization: "darasa",
-    meaning: "to study",
-    hint: "The act that built every library ever raised",
-    fragment: "fragment_2.png",
-    tiles: [
-      { id: "dal",   file: "tile_dal.png",  letter: "د", name: "dal", position: 0 },
-      { id: "ra",    file: "tile_ra.png",   letter: "ر", name: "ra", position: 1 },
-      { id: "seen2", file: "tile_sin.png",  letter: "س", name: "seen", position: 2 },
-      { id: "alif2", file: "tile_alif.png", letter: "ا", name: "alif", position: 3 },
-    ],
-    decoys: [
-      { id: "decoy_ba",  file: "tile_ba.png",  letter: "ب", name: "ba" },
-    ],
-  },
-  {
-    id: 3,
     word: "كِتَاب",
     romanization: "kitab",
     meaning: "book",
@@ -50,6 +18,38 @@ export const fragments = [
     decoys: [
       { id: "decoy_dal", file: "tile_dal.png", letter: "د", name: "dal" },
       { id: "decoy_mim", file: "tile_mim.png", letter: "م", name: "meem" },
+    ],
+  },
+  {
+    id: 2,
+    word: "سَلَام",
+    romanization: "salaam",
+    meaning: "peace",
+    hint: "A greeting carried across centuries of scholarship",
+    fragment: "fragment_1.png",
+    tiles: [
+      { id: "seen",  file: "tile_sin.png",  letter: "س", name: "seen", position: 0 },
+      { id: "lam",   file: "tile_lam.png",  letter: "ل", name: "lam", position: 1 },
+      { id: "alif",  file: "tile_alif.png", letter: "ا", name: "alif", position: 2 },
+      { id: "mim",   file: "tile_mim.png",  letter: "م", name: "meem", position: 3 },
+    ],
+    decoys: [],
+  },
+  {
+    id: 3,
+    word: "دَرَسَ",
+    romanization: "darasa",
+    meaning: "to study",
+    hint: "The act that built every library ever raised",
+    fragment: "fragment_2.png",
+    tiles: [
+      { id: "dal",   file: "tile_dal.png",  letter: "د", name: "dal", position: 0 },
+      { id: "ra",    file: "tile_ra.png",   letter: "ر", name: "ra", position: 1 },
+      { id: "seen2", file: "tile_sin.png",  letter: "س", name: "seen", position: 2 },
+      { id: "alif2", file: "tile_alif.png", letter: "ا", name: "alif", position: 3 },
+    ],
+    decoys: [
+      { id: "decoy_ba",  file: "tile_ba.png",  letter: "ب", name: "ba" },
     ],
   },
   {

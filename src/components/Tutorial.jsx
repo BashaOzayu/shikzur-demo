@@ -93,20 +93,20 @@ const slides = [
       "This here scroll was found in fragments. Your job here is to restore the scroll by putting it back together and rewriting it on new parchment. You'll earn silver shekels to spend at the market.",
   },
   {
-    id: 6,
+    id: 9,
     type: "narration",
-    title: "Salaam — Your First Word",
+    title: "Your First Word: Kitab",
     visual:
-      "The word سَلَام on a parchment fragment, lit by oil lamp light. Below it: the romanization Salaam. Four tiles visible at the bottom showing isolated forms: Sin, Lam, Alif, Meem.",
+      "The word كِتَاب large on a parchment fragment lit by oil lamp light. Romanization below: kitab. Letter names spelled out right to left: Kaf · Ta · Alif · Ba.",
     narration:
-      "The word on this fragment is Salaam. It means peace be to you. It is spelled Seen, Lam, Alif, and Meem.",
+      "The word on this fragment is Kitab. It means book. It is spelled Kaf, Ta, Alif, and Ba.",
   },
   {
-    id: 7,
+    id: 10,
     type: "narration",
     title: "Arabic Placement",
     visual:
-      "Side by side: the word Salaam in English, then سَلَام in Arabic highlighted on the fragment. Below, four tiles show isolated letter forms. The Seen tile is highlighted.",
+      "Side by side: the word Kitab in English, then كِتَاب in Arabic highlighted on the fragment. Below, four tiles show isolated letter forms. The Kaf tile is highlighted.",
     narration:
       "It looks different, doesn't it? That's because in Arabic, letters change form depending on where they are placed in a word. Look...",
   },
@@ -116,12 +116,13 @@ const slides = [
     title: "Isolated, Initial, Medial, and Final",
     visual: "chart",
     extra: [
-      { letter: "Seen", forms: ["س", "سـ", "ـسـ", "ـس"] },
-      { letter: "Lam", forms: ["ل", "لـ", "ـلـ", "ـل"] },
-      { letter: "Alif", forms: ["ا", "ا", "ـا", "ـا"] },
-      { letter: "Meem", forms: ["م", "مـ", "ـمـ", "ـم"] },
+      { letter: "Kaf",  forms: ["ك", "كـ", "ـكـ", "ـك"] },
+      { letter: "Ta",   forms: ["ت", "تـ", "ـتـ", "ـت"] },
+      { letter: "Alif", forms: ["ا", "ا",  "ـا",  "ـا"] },
+      { letter: "Ba",   forms: ["ب", "بـ", "ـبـ", "ـب"] },
     ],
-    narration: "Arabic letters come in 4 forms: Isolated, Initial, Medial, and Final.",
+    narration:
+      "Arabic letters come in 4 forms: Isolated, Initial, Medial, and Final. Look at how each letter in Kitab changes depending on its position.",
   },
   {
     id: 12,
@@ -137,7 +138,7 @@ const slides = [
     type: "choice",
     title: "Choose the Correct Form of Kaf",
     narration:
-      "Kaf in its isolated form looks like this. The Initial, Medial, and Final look like this. Since Kaf is at the beginning of the word Kitab, which tile is the correct form?",
+      "Kaf in its isolated form looks like this. The Initial, Medial, and Final forms look like this. Since Kaf is at the beginning of the word Kitab, which tile shows the correct form?",
     question: "Since Kaf begins the word كِتَاب, which form is correct?",
     options: [
       { label: "Isolated", arabic: "ك", correct: false },
