@@ -1,7 +1,53 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./Tutorial.css";
+import { unlockAudioContext } from "../hooks/useAudio";
+
+function playAudio(src, volume = 0.7) {
+  const audio = new Audio(src);
+  audio.volume = volume;
+  const attempt = () => {
+    audio.play().catch(() => {
+      const playOnTouch = () => {
+        audio.play().catch(() => {});
+        document.removeEventListener("touchstart", playOnTouch);
+      };
+      document.addEventListener("touchstart", playOnTouch, {
+        once: true,
+        passive: true,
+      });
+    });
+  };
+  attempt();
+}
 
 const slides = [
+  {
+    id: 9,
+    type: "narration",
+    title: "The Legend of Tusna",
+    visual:
+      "The ruined library exterior under a purple sunset sky. Sand dunes surrounding the structure.",
+    narration:
+      "The library of Tusna was said to be a myth to most of the world. However, our cartographers included it in our maps, we recited Tusna's stories, and honored its scholars.",
+  },
+  {
+    id: 10,
+    type: "narration",
+    title: "Found in the Sand",
+    visual:
+      "Wide view of the library complex half-buried in sand. Dunes pressing against the walls. A single torch flickers at the entrance.",
+    narration:
+      "Now, over hundreds of years later, we found Tusna enveloped in sand. What used to be the Earth's center of knowledge is now in ruins.",
+  },
+  {
+    id: 11,
+    type: "narration",
+    title: "A Heartbeat Remains",
+    visual:
+      "Close-up of manuscripts half-buried under rubble and sand. Warm ember light glowing between the stones.",
+    narration:
+      "Tusna is nothing but bones, but a heartbeat can still be heard. Beneath the rubble are its scrolls; like embers lying dormant until a gust of desert wind breathes life into it again, a small group of scholars will revive this library to its former glory.",
+  },
   {
     id: 1,
     type: "narration",
@@ -76,33 +122,6 @@ const slides = [
       { letter: "Meem", forms: ["م", "مـ", "ـمـ", "ـم"] },
     ],
     narration: "Arabic letters come in 4 forms: Isolated, Initial, Medial, and Final.",
-  },
-  {
-    id: 9,
-    type: "narration",
-    title: "The Legend of Tusna",
-    visual:
-      "The ruined library exterior under a purple sunset sky. Sand dunes surrounding the structure.",
-    narration:
-      "The library of Tusna was said to be a myth to most of the world. However, our cartographers included it in our maps, we recited Tusna's stories, and honored its scholars.",
-  },
-  {
-    id: 10,
-    type: "narration",
-    title: "Found in the Sand",
-    visual:
-      "Wide view of the library complex half-buried in sand. Dunes pressing against the walls. A single torch flickers at the entrance.",
-    narration:
-      "Now, over hundreds of years later, we found Tusna enveloped in sand. What used to be the Earth's center of knowledge is now in ruins.",
-  },
-  {
-    id: 11,
-    type: "narration",
-    title: "A Heartbeat Remains",
-    visual:
-      "Close-up of manuscripts half-buried under rubble and sand. Warm ember light glowing between the stones.",
-    narration:
-      "Tusna is nothing but bones, but a heartbeat can still be heard. Beneath the rubble are its scrolls; like embers lying dormant until a gust of desert wind breathes life into it again, a small group of scholars will revive this library to its former glory.",
   },
   {
     id: 12,
@@ -228,36 +247,43 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
     });
   }
 
-  const playSlideAudio = useCallback(
-    (slideIndex) => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      if (sfxMuted) return;
-      const n = String(slideIndex + 1).padStart(2, "0");
-      const audio = new Audio(`/sounds/tutorial_${n}.mp3`);
-      audio.volume = sfxVolumeRef.current ?? 0.7;
-      audioRef.current = audio;
-      audio.play().catch(() => {
-        const playOnTouch = () => {
-          audio.play().catch(() => {});
-          document.removeEventListener("touchstart", playOnTouch);
-        };
-        document.addEventListener("touchstart", playOnTouch, { once: true });
-      });
-    },
-    [sfxMuted]
-  );
-
   useEffect(() => {
-    playSlideAudio(currentSlide);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if (sfxMuted) return;
+
+    const audioIndexByTitle = {
+      "Arrival at the Library": "01",
+      "What is Arabic?": "02",
+      "The Arabic Alphabet": "03",
+      "The Tusna Library": "04",
+      "What is Transcription?": "05",
+    };
+    const n = audioIndexByTitle[slide.title];
+    if (!n) return;
+
+    const audio = new Audio(`/sounds/tutorial_${n}.mp3`);
+    audio.volume = sfxVolumeRef.current ?? 0.7;
+    audioRef.current = audio;
+    audio.play().catch(() => {
+      const playOnTouch = () => {
+        audio.play().catch(() => {});
+        document.removeEventListener("touchstart", playOnTouch);
+      };
+      document.addEventListener("touchstart", playOnTouch, {
+        once: true,
+        passive: true,
+      });
+    });
+
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
       }
     };
-  }, [currentSlide, playSlideAudio]);
+  }, [currentSlide, sfxMuted, slide.title]);
 
   useEffect(() => {
     if (!audioRef.current || sfxMuted) return;
@@ -273,7 +299,10 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
         audioRef.current?.play().catch(() => {});
         document.removeEventListener("touchstart", playOnTouch);
       };
-      document.addEventListener("touchstart", playOnTouch, { once: true });
+      document.addEventListener("touchstart", playOnTouch, {
+        once: true,
+        passive: true,
+      });
     });
   }
 
@@ -301,9 +330,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
       setShaking(option.label);
       setTimeout(() => setShaking(null), 500);
       if (!sfxMuted) {
-        const audio = new Audio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`);
-        audio.volume = sfxVolume ?? 0.7;
-        audio.play().catch(() => {});
+        playAudio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`, sfxVolume ?? 0.7);
       }
     }
   }
@@ -326,9 +353,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
       setTimeout(() => setShaking(null), 500);
       setDragging(null);
       if (!sfxMuted) {
-        const audio = new Audio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`);
-        audio.volume = sfxVolume ?? 0.7;
-        audio.play().catch(() => {});
+        playAudio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`, sfxVolume ?? 0.7);
       }
     }
   }
@@ -336,19 +361,28 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
   function handlePuzzleTouchStart(e, tileId) {
     e.preventDefault();
     const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetX = touch.clientX - (rect.left + rect.width / 2);
+    const offsetY = touch.clientY - (rect.top + rect.height / 2);
     setTouchDrag({
       tileId,
       x: touch.clientX,
       y: touch.clientY,
+      offsetX,
+      offsetY,
     });
     setDragging(tileId);
   }
 
   function handlePuzzleTouchMove(e) {
     e.preventDefault();
+    if (!touchDrag) return;
     const touch = e.touches[0];
-    if (!touch) return;
-    setTouchDrag((d) => (d ? { ...d, x: touch.clientX, y: touch.clientY } : d));
+    setTouchDrag((d) => ({
+      ...d,
+      x: touch.clientX,
+      y: touch.clientY,
+    }));
   }
 
   function handlePuzzleTouchEnd(e) {
@@ -434,10 +468,18 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
             top: touchDrag.y - 40,
             pointerEvents: "none",
             zIndex: 1000,
-            opacity: 0.85,
+            opacity: 0.9,
+            transform: "scale(1.15)",
+            transition: "none",
           }}
         >
-          <img src={`/tiles/${slide.bankTile.file}`} alt="" width={80} draggable={false} />
+          <img
+            src={`/tiles/${slide.bankTile.file}`}
+            alt=""
+            width={80}
+            draggable={false}
+            style={{ display: "block" }}
+          />
         </div>
       )}
 
@@ -522,6 +564,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
           <button
             className="tutorial-btn-secondary"
             onClick={() => {
+              unlockAudioContext();
               unlockAudio();
               setCurrentSlide((s) => s - 1);
             }}
@@ -532,6 +575,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
           <button
             className="tutorial-btn-secondary"
             onClick={() => {
+              unlockAudioContext();
               unlockAudio();
               handleReplay();
             }}
@@ -541,6 +585,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
           <button
             className="title-btn"
             onClick={() => {
+              unlockAudioContext();
               unlockAudio();
               handleContinue();
             }}

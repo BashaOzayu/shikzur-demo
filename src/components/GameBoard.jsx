@@ -5,6 +5,23 @@ import "./GameBoard.css";
 import { useTileSound } from "../hooks/useAudio";
 import LetterChart from "./LetterChart";
 
+function playAudio(src, volume = 0.7) {
+  const audio = new Audio(src);
+  audio.volume = volume;
+  const attempt = () => {
+    audio.play().catch(() => {
+      document.addEventListener(
+        "touchstart",
+        () => {
+          audio.play().catch(() => {});
+        },
+        { once: true, passive: true }
+      );
+    });
+  };
+  attempt();
+}
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -69,9 +86,10 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
       setTimeout(() => setShaking(null), 500);
 
       if (!sfxMuted) {
-        const mistakeAudio = new Audio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`);
-        mistakeAudio.volume = sfxVolume;
-        mistakeAudio.play().catch(() => {});
+        playAudio(
+          `/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`,
+          sfxVolume ?? 0.7
+        );
       }
 
       setDragging(null);
@@ -238,22 +256,25 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
           className="touch-ghost"
           style={{
             position: "fixed",
-            left: touchDrag.x - 40 - (touchDrag.offsetX ?? 0),
-            top: touchDrag.y - 40 - (touchDrag.offsetY ?? 0),
+            left: touchDrag.x - 40,
+            top: touchDrag.y - 40,
             pointerEvents: "none",
             zIndex: 1000,
-            opacity: 0.85,
-            transform: "scale(1.1)",
+            opacity: 0.9,
+            transform: "scale(1.15)",
+            transition: "none",
           }}
         >
           <img
             src={`/tiles/${
-              bankTiles.find((t) => t.id === dragging.tileId)?.file ||
-              slots.find((s) => s?.id === dragging.tileId)?.file ||
+              bankTiles.find((t) => t.id === dragging?.tileId)?.file ||
+              slots.find((s) => s?.id === dragging?.tileId)?.file ||
               ""
             }`}
             alt=""
             width={80}
+            draggable={false}
+            style={{ display: "block" }}
           />
         </div>
       )}

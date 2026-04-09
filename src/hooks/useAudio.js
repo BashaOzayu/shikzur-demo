@@ -1,5 +1,21 @@
 import { useEffect, useRef } from "react";
 
+let audioUnlocked = false;
+
+export function unlockAudioContext() {
+  if (audioUnlocked) return;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return;
+  const ctx = new Ctx();
+  ctx.resume();
+  const silent = ctx.createBuffer(1, 1, 22050);
+  const source = ctx.createBufferSource();
+  source.buffer = silent;
+  source.connect(ctx.destination);
+  source.start(0);
+  audioUnlocked = true;
+}
+
 export function useBackgroundMusic(src, muted, volume) {
   const audioRef = useRef(null);
 
@@ -28,9 +44,10 @@ export function useBackgroundMusic(src, muted, volume) {
 }
 
 export function useTileSound(src, muted, volume) {
-  const audioRef = useRef(null);
+  const poolRef = useRef([]);
   const mutedRef = useRef(muted);
   const volumeRef = useRef(volume ?? 0.7);
+  const poolIndexRef = useRef(0);
 
   useEffect(() => {
     mutedRef.current = muted;
@@ -40,15 +57,20 @@ export function useTileSound(src, muted, volume) {
   }, [volume]);
 
   useEffect(() => {
-    audioRef.current = new Audio(src);
-    audioRef.current.volume = volumeRef.current;
+    poolRef.current = [new Audio(src), new Audio(src), new Audio(src)];
+    poolRef.current.forEach((a) => {
+      a.volume = volumeRef.current;
+    });
   }, [src]);
 
   return () => {
-    if (audioRef.current && !mutedRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.volume = volumeRef.current;
-      audioRef.current.play().catch(() => {});
-    }
+    if (mutedRef.current) return;
+    const pool = poolRef.current;
+    if (!pool.length) return;
+    const audio = pool[poolIndexRef.current % pool.length];
+    poolIndexRef.current++;
+    audio.volume = volumeRef.current;
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
   };
 }
