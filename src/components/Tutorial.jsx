@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import "./Tutorial.css";
 import { unlockAudioContext } from "../hooks/useAudio";
+import EmberEffect from "./EmberEffect";
 
 function playAudio(src, volume = 0.7) {
   const audio = new Audio(src);
@@ -401,6 +402,17 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
   }
 
   const renderVisual = () => {
+    if (slide.title === "A Heartbeat Remains") {
+      return (
+        <div style={{ position: "relative", width: "100%" }}>
+          <EmberEffect />
+          <div className="tutorial-visual-placeholder">
+            <p className="tutorial-visual-desc">{slide.visual}</p>
+          </div>
+        </div>
+      );
+    }
+
     if (slide.visual === "chart") {
       return (
         <div className="tutorial-chart">
