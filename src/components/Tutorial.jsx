@@ -163,7 +163,13 @@ const slides = [
       { letter: "ا", name: "alif", locked: false, target: false },
       { letter: "ب", name: "ba", locked: false, target: false },
     ],
-    bankTile: { id: "ta_tutorial", file: "tile_ta.png", letter: "ت", name: "ta" },
+    bankTiles: [
+      { id: "ta_tutorial", file: "tile_ta.png", letter: "ت", name: "ta", correct: true },
+      { id: "alif_tutorial", file: "tile_alif.png", letter: "ا", name: "alif", correct: false },
+      { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba", correct: false },
+      { id: "decoy_sin", file: "tile_sin.png", letter: "س", name: "seen", correct: false },
+    ],
+    targetTile: "ta_tutorial",
     targetSlot: 1,
   },
   {
@@ -180,7 +186,12 @@ const slides = [
       { letter: "ا", name: "alif", locked: false, target: true },
       { letter: "ب", name: "ba", locked: false, target: false },
     ],
-    bankTile: { id: "alif_tutorial", file: "tile_alif.png", letter: "ا", name: "alif" },
+    bankTiles: [
+      { id: "alif_tutorial", file: "tile_alif.png", letter: "ا", name: "alif", correct: true },
+      { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba", correct: false },
+      { id: "decoy_mim", file: "tile_mim.png", letter: "م", name: "meem", correct: false },
+    ],
+    targetTile: "alif_tutorial",
     targetSlot: 2,
   },
   {
@@ -198,7 +209,12 @@ const slides = [
       { letter: "ا", name: "alif", locked: true },
       { letter: "ب", name: "ba", locked: false, target: true },
     ],
-    bankTile: { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba" },
+    bankTiles: [
+      { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba", correct: true },
+      { id: "decoy_dal", file: "tile_dal.png", letter: "د", name: "dal", correct: false },
+      { id: "decoy_ra", file: "tile_ra.png", letter: "ر", name: "ra", correct: false },
+    ],
+    targetTile: "ba_tutorial",
     targetSlot: 3,
   },
   {
@@ -402,10 +418,12 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
 
   function handlePuzzleDrop(slotIndex) {
     if (!dragging) return;
-    const cur = slides[currentSlide];
-    if (cur.type !== "puzzle") return;
-    const idx = Number(slotIndex);
-    if (idx === cur.targetSlot) {
+    const s = slides[currentSlide];
+    if (s.type !== "puzzle") return;
+    const isCorrectTile = dragging === s.targetTile;
+    const isCorrectSlot = Number(slotIndex) === s.targetSlot;
+
+    if (isCorrectTile && isCorrectSlot) {
       setPuzzleComplete(true);
       setInteractionComplete(true);
       setDragging(null);
@@ -503,12 +521,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
         <div
           className="tutorial-visual-placeholder"
           style={{
-            alignSelf: "stretch",
-            width: "100%",
             backgroundImage: `url(${bgImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            position: "relative",
           }}
         >
           <div
@@ -552,35 +565,42 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
     </div>
   );
 
-  const renderPuzzle = () => (
+  const renderPuzzle = () => {
+    const targetBankTile = slide.bankTiles.find((t) => t.id === slide.targetTile);
+
+    return (
     <div
       className="tutorial-puzzle"
       onTouchMove={handlePuzzleTouchMove}
       onTouchEnd={handlePuzzleTouchEnd}
       style={{ touchAction: "none" }}
     >
-      {touchDrag && dragging && (
-        <div
-          style={{
-            position: "fixed",
-            left: touchDrag.x - 40,
-            top: touchDrag.y - 40,
-            pointerEvents: "none",
-            zIndex: 1000,
-            opacity: 0.9,
-            transform: "scale(1.15)",
-            transition: "none",
-          }}
-        >
-          <img
-            src={`/tiles/${slide.bankTile.file}`}
-            alt=""
-            width={80}
-            draggable={false}
-            style={{ display: "block" }}
-          />
-        </div>
-      )}
+      {touchDrag && dragging && (() => {
+        const tile = slide.bankTiles?.find((t) => t.id === dragging);
+        if (!tile) return null;
+        return (
+          <div
+            style={{
+              position: "fixed",
+              left: touchDrag.x - 40,
+              top: touchDrag.y - 40,
+              pointerEvents: "none",
+              zIndex: 1000,
+              opacity: 0.9,
+              transform: "scale(1.15)",
+              transition: "none",
+            }}
+          >
+            <img
+              src={`/tiles/${tile.file}`}
+              alt=""
+              width={80}
+              draggable={false}
+              style={{ display: "block" }}
+            />
+          </div>
+        );
+      })()}
 
       <div
         className="tutorial-fragment"
@@ -619,9 +639,9 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
                 draggable={false}
               />
             )}
-            {slot.target && puzzleComplete && (
+            {slot.target && puzzleComplete && targetBankTile && (
               <img
-                src={`/tiles/${slide.bankTile.file}`}
+                src={`/tiles/${targetBankTile.file}`}
                 alt={slot.letter}
                 width={64}
                 draggable={false}
@@ -631,26 +651,30 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
         ))}
       </div>
 
-      {!puzzleComplete && (
-        <div className="tutorial-bank">
-          <div
-            className={`tutorial-bank-tile ${shaking === slide.bankTile.id ? "option-shake" : ""}`}
-            draggable
-            onDragStart={() => handlePuzzleDragStart(slide.bankTile.id)}
-            onTouchStart={(e) => handlePuzzleTouchStart(e, slide.bankTile.id)}
-          >
-            <img
-              src={`/tiles/${slide.bankTile.file}`}
-              alt={slide.bankTile.letter}
-              width={72}
-              draggable={false}
-            />
-            <span className="tile-name-label">{slide.bankTile.name}</span>
-          </div>
-        </div>
-      )}
+      <div className="tutorial-bank">
+        {slide.bankTiles
+          .filter((t) => !(puzzleComplete && t.id === slide.targetTile))
+          .map((tile) => (
+            <div
+              key={tile.id}
+              className={`tutorial-bank-tile ${shaking === tile.id ? "option-shake" : ""}`}
+              draggable
+              onDragStart={() => handlePuzzleDragStart(tile.id)}
+              onTouchStart={(e) => handlePuzzleTouchStart(e, tile.id)}
+            >
+              <img
+                src={`/tiles/${tile.file}`}
+                alt={tile.letter}
+                width={64}
+                draggable={false}
+              />
+              <span className="tile-name-label">{tile.name}</span>
+            </div>
+          ))}
+      </div>
     </div>
-  );
+    );
+  };
 
   const renderReveal = () => {
     const rtlOrder = [3, 2, 1, 0];

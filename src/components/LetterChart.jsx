@@ -34,14 +34,34 @@ const letters = [
 export default function LetterChart({ isOpen, onClose }) {
   return (
     <>
-      <div
-        className={`letterchart-overlay ${isOpen ? "open" : ""}`}
-        onClick={onClose}
-      />
+      {isOpen && (
+        <div
+          onClick={onClose}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            zIndex: 199,
+          }}
+        />
+      )}
       <aside className={`letterchart-panel ${isOpen ? "open" : ""}`}>
         <header className="letterchart-header">
           <h3 className="letterchart-title">Letter Reference</h3>
-          <button className="letterchart-close" onClick={onClose}>✕</button>
+          <button
+            onClick={onClose}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "var(--bronze-light)",
+              fontSize: "1.1rem",
+              cursor: "pointer",
+              padding: "4px 8px",
+              lineHeight: 1,
+            }}
+          >
+            ✕
+          </button>
         </header>
         <div className="letterchart-table">
           <div className="table-head">
