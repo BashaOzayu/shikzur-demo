@@ -175,6 +175,7 @@ export default function Tutorial({
 }) {
   const [showVideo, setShowVideo] = useState(true);
   const videoRef = useRef(null);
+  const audioRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [interactionComplete, setInteractionComplete] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -214,7 +215,6 @@ export default function Tutorial({
 
   const slide = slides[currentSlide];
 
-  const audioRef = useRef(null);
   const unlockedRef = useRef(false);
   const sfxVolumeRef = useRef(sfxVolume);
   sfxVolumeRef.current = sfxVolume;
@@ -233,6 +233,38 @@ export default function Tutorial({
     setChartHighlighted(false);
     chartOpenedRef.current = false;
   }, [currentSlide]);
+
+  useEffect(() => {
+    if (showVideo) return;
+
+    // Only play for first 3 slides
+    if (currentSlide > 2) return;
+
+    const audioFile = `/sounds/tutorial_${currentSlide + 1}.mp3`;
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
+    const audio = new Audio(audioFile);
+    audio.volume = 0.8;
+    audioRef.current = audio;
+
+    audio.play().catch(() => {
+      const playOnTouch = () => {
+        audio.play().catch(() => {});
+        document.removeEventListener("touchstart", playOnTouch);
+      };
+      document.addEventListener("touchstart", playOnTouch, { once: true, passive: true });
+    });
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [currentSlide, showVideo]);
 
   useEffect(() => {
     const slide = slides[currentSlide];
@@ -290,10 +322,12 @@ export default function Tutorial({
   }, [sfxVolume, sfxMuted]);
 
   function handleReplay() {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
-    }
+    if (currentSlide > 2) return;
+    const audioFile = `/sounds/tutorial_${currentSlide + 1}.mp3`;
+    const audio = new Audio(audioFile);
+    audio.volume = 0.8;
+    audioRef.current = audio;
+    audio.play().catch(() => {});
   }
 
   function handleContinue() {
