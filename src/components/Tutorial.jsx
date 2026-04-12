@@ -255,6 +255,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
   const [tutorialBgLoaded, setTutorialBgLoaded] = useState(false);
   const [litLetters, setLitLetters] = useState([]);
   const [chartHighlighted, setChartHighlighted] = useState(false);
+  const chartOpenedRef = useRef(false);
   const touchDragRef = useRef(null);
   touchDragRef.current = touchDrag;
 
@@ -293,18 +294,20 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
     setTouchDrag(null);
     setLitLetters([]);
     setChartHighlighted(false);
+    chartOpenedRef.current = false;
   }, [currentSlide]);
 
   useEffect(() => {
-    const s = slides[currentSlide];
-    if (s.title === "Place Ta") {
+    const slide = slides[currentSlide];
+    if (slide.title === "Place Ta" && !chartOpenedRef.current) {
+      chartOpenedRef.current = true;
       setChartHighlighted(true);
       const timer = setTimeout(() => {
-        onOpenChart?.();
+        onOpenChart();
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [currentSlide, onOpenChart]);
+  }, [currentSlide]);
 
   useEffect(() => {
     const s = slides[currentSlide];
