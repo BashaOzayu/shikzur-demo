@@ -477,7 +477,6 @@
   flex-direction: row;
   gap: 12px;
   justify-content: center;
-  direction: rtl;
 }
 
 .reveal-letter {

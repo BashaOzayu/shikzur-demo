@@ -23,118 +23,6 @@ function playAudio(src, volume = 0.7) {
 
 const slides = [
   {
-    id: 9,
-    type: "narration",
-    title: "The Legend of Tusna",
-    visual:
-      "The ruined library exterior under a purple sunset sky. Sand dunes surrounding the structure.",
-    narration:
-      "The library of Tusna was said to be a myth to most of the world. However, our cartographers included it in our maps, we recited Tusna's stories, and honored its scholars.",
-  },
-  {
-    id: 10,
-    type: "narration",
-    title: "Found in the Sand",
-    visual:
-      "Wide view of the library complex half-buried in sand. Dunes pressing against the walls. A single torch flickers at the entrance.",
-    narration:
-      "Now, over hundreds of years later, we found Tusna enveloped in sand. What used to be the Earth's center of knowledge is now in ruins.",
-  },
-  {
-    id: 11,
-    type: "narration",
-    title: "A Heartbeat Remains",
-    visual:
-      "Close-up of manuscripts half-buried under rubble and sand. Warm ember light glowing between the stones.",
-    narration:
-      "Tusna is nothing but bones, but a heartbeat can still be heard. Beneath the rubble are its scrolls; like embers lying dormant until a gust of desert wind breathes life into it again, a small group of scholars will revive this library to its former glory.",
-  },
-  {
-    id: 1,
-    type: "narration",
-    title: "Arrival at the Library",
-    visual:
-      "A vast desert at dusk. Purple sky. Silhouettes of travelers approaching ruins on the dunes. Palm trees bent in wind.",
-    narration: "Ah, welcome to the library.",
-  },
-  {
-    id: 2,
-    type: "narration",
-    title: "What is Arabic?",
-    visual:
-      "An aged inscription carved into alabaster stone at the library entrance. Arabic script visible. English translation fades in beneath it: Ta-Waw-Sin-Nun-Alif.",
-    narration:
-      "This is Arabic. An ancient Semitic language developed from the Nabataean Aramaic script between the 3rd and 4th centuries AD.",
-  },
-  {
-    id: 3,
-    type: "narration",
-    title: "The Arabic Alphabet",
-    visual:
-      "An unfurled scroll displaying all 28 Arabic letters arranged in rows, hand-inked on aged parchment.",
-    narration:
-      "Arabic has 28 letters, and like most Semitic languages, it is comprised of all consonants — no vowels.",
-  },
-  {
-    id: 4,
-    type: "narration",
-    title: "The Tusna Library",
-    visual:
-      "Interior of a ruined library. Broken cedar shelves. Sand drifting through cracked walls. Manuscripts half-buried. A single oil lamp burns in the corner.",
-    narration:
-      "In this ancient library, destroyed by war and the sands of time, contains over 1400 years of history and secrets.",
-  },
-  {
-    id: 5,
-    type: "narration",
-    title: "What is Transcription?",
-    visual:
-      "A scroll lying in fragments on a stone floor. Beside it, a fresh sheet of parchment and a reed pen.",
-    narration:
-      "This here scroll was found in fragments. Your job here is to restore the scroll by putting it back together and rewriting it on new parchment. You'll earn silver shekels to spend at the market.",
-  },
-  {
-    id: 9,
-    type: "narration",
-    title: "Your First Word: Kitab",
-    visual:
-      "The word كِتَاب large on a parchment fragment lit by oil lamp light. Romanization below: kitab. Letter names spelled out right to left: Kaf · Ta · Alif · Ba.",
-    narration:
-      "The word on this fragment is Kitab. It means book. It is spelled Kaf, Ta, Alif, and Ba.",
-  },
-  {
-    id: 10,
-    type: "narration",
-    title: "Arabic Placement",
-    visual:
-      "Side by side: the word Kitab in English, then كِتَاب in Arabic highlighted on the fragment. Below, four tiles show isolated letter forms. The Kaf tile is highlighted.",
-    narration:
-      "It looks different, doesn't it? That's because in Arabic, letters change form depending on where they are placed in a word. Look...",
-  },
-  {
-    id: 8,
-    type: "narration",
-    title: "Isolated, Initial, Medial, and Final",
-    visual: "chart",
-    extra: [
-      { letter: "Kaf",  forms: ["ك", "كـ", "ـكـ", "ـك"] },
-      { letter: "Ta",   forms: ["ت", "تـ", "ـتـ", "ـت"] },
-      { letter: "Alif", forms: ["ا", "ا",  "ـا",  "ـا"] },
-      { letter: "Ba",   forms: ["ب", "بـ", "ـبـ", "ـب"] },
-    ],
-    narration:
-      "Arabic letters come in 4 forms: Isolated, Initial, Medial, and Final. Look at how each letter in Kitab changes depending on its position.",
-  },
-  {
-    id: 12,
-    type: "narration",
-    title: "Your First Word: Kitab",
-    visual:
-      "The word كِتَاب large on a parchment fragment. Romanization below: kitab. Letter names spelled out right to left: Kaf · Ta · Alif · Ba.",
-    narration:
-      "Let's rewrite this word together. The word is Kitab. Kaf-Ta-Alif-Ba. You need to put the tiles in order, from right to left, to transcribe the word.",
-  },
-  {
     id: 13,
     type: "choice",
     title: "Choose the Correct Form of Kaf",
@@ -303,9 +191,10 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
     setLitLetters([]);
     const timers = [];
 
-    slide.letters.forEach((_, i) => {
+    // Light up in reading order: 0 (Kaf) → 1 (Ta) → 2 (Alif) → 3 (Ba)
+    [0, 1, 2, 3].forEach((letterIndex, i) => {
       const timer = setTimeout(() => {
-        setLitLetters((prev) => [...prev, i]);
+        setLitLetters((prev) => [...prev, letterIndex]);
       }, 1000 + i * 1500);
       timers.push(timer);
     });
@@ -717,9 +606,10 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
 
   const renderReveal = () => {
     const slide = slides[currentSlide];
-    // Display RTL: Kaf on right, Ba on left visually
-    // But light up in reading order: Kaf(0) → Ta(1) → Alif(2) → Ba(3)
-    const displayOrder = [3, 2, 1, 0]; // Ba, Alif, Ta, Kaf (left to right visually)
+
+    // Letters in RTL visual order: index 0=Kaf on right, 3=Ba on left
+    // Display order left-to-right on screen: Ba(3), Alif(2), Ta(1), Kaf(0)
+    // Light up order: Kaf(0) first, Ba(3) last
 
     return (
       <div className="tutorial-reveal">
@@ -741,9 +631,9 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
           </p>
         </div>
 
-        <div className="reveal-letters">
-          {displayOrder.map((letterIndex) => {
-            const letter = slide.letters[letterIndex];
+        {/* dir="rtl" makes Kaf appear on the right, Ba on the left */}
+        <div className="reveal-letters" dir="rtl">
+          {slide.letters.map((letter, letterIndex) => {
             const isLit = litLetters.includes(letterIndex);
             return (
               <div
