@@ -202,6 +202,20 @@ const slides = [
     targetSlot: 3,
   },
   {
+    id: 16.5,
+    type: "reveal",
+    title: "Kitab",
+    narration: "Good. So, Kaf, Ta, Alif, and Ba come together to create the word, Kitab.",
+    word: "كِتَاب",
+    fragment: "fragment_1.png",
+    letters: [
+      { arabic: "ك", name: "Kaf" },
+      { arabic: "ت", name: "Ta" },
+      { arabic: "ا", name: "Alif" },
+      { arabic: "ب", name: "Ba" },
+    ],
+  },
+  {
     id: 17,
     type: "narration",
     title: "Well Done",
@@ -221,6 +235,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
   const [touchDrag, setTouchDrag] = useState(null);
   const [dragging, setDragging] = useState(null);
   const [tutorialBgLoaded, setTutorialBgLoaded] = useState(false);
+  const [litLetters, setLitLetters] = useState([]);
   const touchDragRef = useRef(null);
   touchDragRef.current = touchDrag;
 
@@ -257,6 +272,24 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
     setPuzzleComplete(false);
     setDragging(null);
     setTouchDrag(null);
+    setLitLetters([]);
+  }, [currentSlide]);
+
+  useEffect(() => {
+    const s = slides[currentSlide];
+    if (s.type !== "reveal") return;
+
+    setLitLetters([]);
+    const timers = [];
+
+    s.letters.forEach((_, i) => {
+      const timer = setTimeout(() => {
+        setLitLetters((prev) => [...prev, i]);
+      }, 1000 + i * 1500);
+      timers.push(timer);
+    });
+
+    return () => timers.forEach(clearTimeout);
   }, [currentSlide]);
 
   function unlockAudio() {
@@ -276,16 +309,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
     }
     if (sfxMuted) return;
 
-    const audioIndexByTitle = {
-      "Arrival at the Library": "01",
-      "What is Arabic?": "02",
-      "The Arabic Alphabet": "03",
-      "The Tusna Library": "04",
-      "What is Transcription?": "05",
-    };
-    const n = audioIndexByTitle[slide.title];
-    if (!n) return;
-
+    const n = String(currentSlide + 1).padStart(2, "0");
     const audio = new Audio(`/sounds/tutorial_${n}.mp3`);
     audio.volume = sfxVolumeRef.current ?? 0.7;
     audioRef.current = audio;
@@ -305,7 +329,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
         audioRef.current.pause();
       }
     };
-  }, [currentSlide, sfxMuted, slide.title]);
+  }, [currentSlide, sfxMuted]);
 
   useEffect(() => {
     if (!audioRef.current || sfxMuted) return;
@@ -605,6 +629,48 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
     </div>
   );
 
+  const renderReveal = () => {
+    const rtlOrder = [3, 2, 1, 0];
+
+    return (
+      <div className="tutorial-reveal">
+        <div
+          className="tutorial-fragment"
+          style={{
+            backgroundImage: `url(/tiles/${slide.fragment})`,
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+            minHeight: "160px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <p className="tutorial-word-arabic" style={{ color: "#1a0a00" }}>
+            {slide.word}
+          </p>
+        </div>
+
+        <div className="reveal-letters">
+          {rtlOrder.map((letterIndex) => {
+            const letter = slide.letters[letterIndex];
+            const isLit = litLetters.includes(letterIndex);
+            return (
+              <div
+                key={letterIndex}
+                className={`reveal-letter ${isLit ? "reveal-letter-lit" : ""}`}
+              >
+                <span className="reveal-arabic">{letter.arabic}</span>
+                <span className="reveal-name">{letter.name}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="tutorial-screen" style={{ touchAction: "none" }}>
       <div className="tutorial-slide anim-fade-in">
@@ -614,6 +680,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
           {slide.type === "narration" && renderVisual()}
           {slide.type === "choice" && renderChoice()}
           {slide.type === "puzzle" && renderPuzzle()}
+          {slide.type === "reveal" && renderReveal()}
         </div>
 
         <div className="tutorial-narration-bar">
