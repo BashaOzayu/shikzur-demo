@@ -21,6 +21,59 @@ function playAudio(src, volume = 0.7) {
   attempt();
 }
 
+function LoreVideo({ videoRef, onEnded, onSkip }) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100vw",
+        height: "100vh",
+        background: "#000",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 10,
+      }}
+    >
+      <video
+        ref={videoRef}
+        src="/video/Shikzur_intro.mp4"
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+        playsInline
+        autoPlay
+        onEnded={onEnded}
+      />
+
+      <button
+        type="button"
+        onClick={onSkip}
+        style={{
+          position: "absolute",
+          bottom: 32,
+          right: 32,
+          background: "rgba(13,13,26,0.7)",
+          border: "1px solid rgba(168,124,69,0.4)",
+          color: "var(--parchment)",
+          fontFamily: "'Cormorant Garamond', Georgia, serif",
+          fontSize: "0.85rem",
+          letterSpacing: "0.12em",
+          padding: "10px 24px",
+          cursor: "pointer",
+          zIndex: 20,
+        }}
+      >
+        Skip →
+      </button>
+    </div>
+  );
+}
+
 const slides = [
   {
     id: 13,
@@ -113,6 +166,8 @@ const slides = [
 const TRANSCRIBE_KITAB_SLIDE_INDEX = slides.findIndex((s) => s.title === "Transcribe Kitab");
 
 export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart }) {
+  const [showVideo, setShowVideo] = useState(true);
+  const videoRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [interactionComplete, setInteractionComplete] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -213,53 +268,15 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
   }
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    if (sfxMuted) return;
-
-    const n = String(currentSlide + 1).padStart(2, "0");
-    const audio = new Audio(`/sounds/tutorial_${n}.mp3`);
-    audio.volume = sfxVolumeRef.current ?? 0.7;
-    audioRef.current = audio;
-    audio.play().catch(() => {
-      const playOnTouch = () => {
-        audio.play().catch(() => {});
-        document.removeEventListener("touchstart", playOnTouch);
-      };
-      document.addEventListener("touchstart", playOnTouch, {
-        once: true,
-        passive: true,
-      });
-    });
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-    };
-  }, [currentSlide, sfxMuted]);
-
-  useEffect(() => {
     if (!audioRef.current || sfxMuted) return;
     audioRef.current.volume = sfxVolume ?? 0.7;
   }, [sfxVolume, sfxMuted]);
 
   function handleReplay() {
-    if (sfxMuted || !audioRef.current) return;
-    audioRef.current.volume = sfxVolume ?? 0.7;
-    audioRef.current.currentTime = 0;
-    audioRef.current.play().catch(() => {
-      const playOnTouch = () => {
-        audioRef.current?.play().catch(() => {});
-        document.removeEventListener("touchstart", playOnTouch);
-      };
-      document.addEventListener("touchstart", playOnTouch, {
-        once: true,
-        passive: true,
-      });
-    });
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    }
   }
 
   function handleContinue() {
@@ -649,6 +666,16 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
       </div>
     );
   };
+
+  if (showVideo) {
+    return (
+      <LoreVideo
+        videoRef={videoRef}
+        onEnded={() => setShowVideo(false)}
+        onSkip={() => setShowVideo(false)}
+      />
+    );
+  }
 
   return (
     <div className="tutorial-screen" style={{ touchAction: "none" }}>
