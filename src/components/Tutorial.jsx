@@ -157,8 +157,7 @@ const slides = [
     id: 17,
     type: "narration",
     title: "Well Done",
-    visual:
-      "The completed word كِتَاب glowing softly on the parchment fragment. Warm bronze light surrounds it.",
+    visual: null,
     narration:
       "Well done, you have transcribed your first word. Your scholarly burden has just begun.",
   },
@@ -239,9 +238,17 @@ export default function Tutorial({
 
   useEffect(() => {
     if (showVideo) return;
-    if (currentSlide > 2) return;
 
-    const audioFile = `/sounds/tutorial_${currentSlide + 1}.mp3`;
+    const slide = slides[currentSlide];
+
+    let audioFile = null;
+
+    if (currentSlide === 0) audioFile = "/sounds/tutorial_1.mp3";
+    else if (currentSlide === 1) audioFile = "/sounds/tutorial_2.mp3";
+    else if (currentSlide === 2) audioFile = "/sounds/tutorial_3.mp3";
+    else if (slide.title === "Well Done") audioFile = "/sounds/tutorial_4.mp3";
+
+    if (!audioFile) return;
 
     if (audioRef.current) {
       audioRef.current.pause();
@@ -260,7 +267,6 @@ export default function Tutorial({
       });
     };
 
-    // Small delay to let iOS audio context unlock after video ends
     const timer = setTimeout(tryPlay, 400);
 
     return () => {
@@ -327,10 +333,15 @@ export default function Tutorial({
   }, [sfxVolume, sfxMuted]);
 
   function handleReplay() {
-    if (currentSlide > 2) return;
-    const audioFile = `/sounds/tutorial_${currentSlide + 1}.mp3`;
+    const s = slides[currentSlide];
+    let audioFile = null;
+    if (currentSlide === 0) audioFile = "/sounds/tutorial_1.mp3";
+    else if (currentSlide === 1) audioFile = "/sounds/tutorial_2.mp3";
+    else if (currentSlide === 2) audioFile = "/sounds/tutorial_3.mp3";
+    else if (s.title === "Well Done") audioFile = "/sounds/tutorial_4.mp3";
+    if (!audioFile) return;
     const audio = new Audio(audioFile);
-    audio.volume = 0.8;
+    audio.volume = sfxVolume ?? 0.8;
     audioRef.current = audio;
     audio.play().catch(() => {});
   }
@@ -463,6 +474,8 @@ export default function Tutorial({
   }
 
   const renderVisual = () => {
+    if (!slide.visual) return null;
+
     if (slide.title === "A Heartbeat Remains") {
       return (
         <div style={{ position: "relative", width: "100%" }}>
@@ -782,7 +795,18 @@ export default function Tutorial({
         </div>
       )}
       <div className="tutorial-slide anim-fade-in">
-        <p className="tutorial-slide-title">{slide.title}</p>
+        <p
+          className="tutorial-slide-title"
+          style={slide.title === "Well Done" ? {
+            fontSize: "2.8rem",
+            color: "var(--ivory)",
+            textShadow: "0 0 30px rgba(201,151,58,0.5)",
+            letterSpacing: "0.15em",
+            marginBottom: "16px",
+          } : {}}
+        >
+          {slide.title}
+        </p>
 
         <div className="tutorial-visual-area">
           {slide.type === "narration" && renderVisual()}
@@ -792,7 +816,14 @@ export default function Tutorial({
         </div>
 
         <div className="tutorial-narration-bar">
-          <p>{slide.narration}</p>
+          <p style={slide.title === "Well Done" ? {
+            fontSize: "1.2rem",
+            lineHeight: "1.8",
+            color: "var(--parchment)",
+            fontStyle: "italic",
+          } : {}}>
+            {slide.narration}
+          </p>
         </div>
 
         <div className="tutorial-nav">
