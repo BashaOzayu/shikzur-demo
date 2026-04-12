@@ -160,8 +160,8 @@ const slides = [
     slots: [
       { letter: "ك", name: "kaf", locked: true },
       { letter: "ت", name: "ta", locked: false, target: true },
-      { letter: "ا", name: "alif", locked: true },
-      { letter: "ب", name: "ba", locked: true },
+      { letter: "ا", name: "alif", locked: false, target: false },
+      { letter: "ب", name: "ba", locked: false, target: false },
     ],
     bankTile: { id: "ta_tutorial", file: "tile_ta.png", letter: "ت", name: "ta" },
     targetSlot: 1,
@@ -178,7 +178,7 @@ const slides = [
       { letter: "ك", name: "kaf", locked: true },
       { letter: "ت", name: "ta", locked: true },
       { letter: "ا", name: "alif", locked: false, target: true },
-      { letter: "ب", name: "ba", locked: true },
+      { letter: "ب", name: "ba", locked: false, target: false },
     ],
     bankTile: { id: "alif_tutorial", file: "tile_alif.png", letter: "ا", name: "alif" },
     targetSlot: 2,
@@ -226,7 +226,9 @@ const slides = [
   },
 ];
 
-export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
+const PLACE_TA_SLIDE_INDEX = slides.findIndex((s) => s.title === "Place Ta");
+
+export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [interactionComplete, setInteractionComplete] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -236,6 +238,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
   const [dragging, setDragging] = useState(null);
   const [tutorialBgLoaded, setTutorialBgLoaded] = useState(false);
   const [litLetters, setLitLetters] = useState([]);
+  const [chartHighlighted, setChartHighlighted] = useState(false);
   const touchDragRef = useRef(null);
   touchDragRef.current = touchDrag;
 
@@ -273,7 +276,19 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
     setDragging(null);
     setTouchDrag(null);
     setLitLetters([]);
+    setChartHighlighted(false);
   }, [currentSlide]);
+
+  useEffect(() => {
+    const s = slides[currentSlide];
+    if (s.title === "Place Ta") {
+      setChartHighlighted(true);
+      const timer = setTimeout(() => {
+        onOpenChart?.();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [currentSlide, onOpenChart]);
 
   useEffect(() => {
     const s = slides[currentSlide];
@@ -596,9 +611,17 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => handlePuzzleDrop(i)}
           >
-            {(slot.locked || (slot.target && puzzleComplete)) && (
+            {slot.locked && (
               <img
                 src={`/tiles/tile_${slot.name}.png`}
+                alt={slot.letter}
+                width={64}
+                draggable={false}
+              />
+            )}
+            {slot.target && puzzleComplete && (
+              <img
+                src={`/tiles/${slide.bankTile.file}`}
                 alt={slot.letter}
                 width={64}
                 draggable={false}
@@ -673,6 +696,21 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
 
   return (
     <div className="tutorial-screen" style={{ touchAction: "none" }}>
+      {(chartHighlighted ||
+        (PLACE_TA_SLIDE_INDEX !== -1 && currentSlide >= PLACE_TA_SLIDE_INDEX)) && (
+        <div
+          className="chart-highlight-pulse"
+          style={{
+            position: "fixed",
+            top: 12,
+            right: 12,
+            zIndex: 300,
+            pointerEvents: "none",
+          }}
+        >
+          <span className="chart-pulse-ring" />
+        </div>
+      )}
       <div className="tutorial-slide anim-fade-in">
         <p className="tutorial-slide-title">{slide.title}</p>
 

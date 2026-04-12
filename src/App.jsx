@@ -6,6 +6,7 @@ import TitleScreen from "./components/TitleScreen";
 import CompletionScreen from "./components/CompletionScreen";
 import ShekelsReward from "./components/ShekelsReward";
 import Market from "./components/Market";
+import LetterChart from "./components/LetterChart";
 import { useBackgroundMusic } from "./hooks/useAudio";
 import VolumeToggle from "./components/VolumeToggle";
 import ShekelsHUD from "./components/ShekelsHUD";
@@ -20,6 +21,7 @@ export default function App() {
   const [sfxMuted, setSfxMuted] = useState(false);
   const [musicVolume, setMusicVolume] = useState(0.35);
   const [sfxVolume, setSfxVolume] = useState(0.7);
+  const [chartOpen, setChartOpen] = useState(false);
 
   const currentFragment = fragments[levelIndex];
   useBackgroundMusic("/sounds/oudmusic.mp3", musicMuted, musicVolume);
@@ -56,6 +58,7 @@ export default function App() {
           onComplete={() => setScreen("game")}
           sfxMuted={sfxMuted}
           sfxVolume={sfxVolume}
+          onOpenChart={() => setChartOpen(true)}
         />
       )}
       {screen === "title" && (
@@ -69,6 +72,7 @@ export default function App() {
           onComplete={handleLevelComplete}
           sfxMuted={sfxMuted}
           sfxVolume={sfxVolume}
+          onOpenChart={() => setChartOpen(true)}
         />
       )}
       {screen === "reward" && (
@@ -90,6 +94,7 @@ export default function App() {
       {screen === "complete" && (
         <CompletionScreen onRestart={() => { setLevelIndex(0); setScreen("title"); }} />
       )}
+      <LetterChart isOpen={chartOpen} onClose={() => setChartOpen(false)} />
     </div>
   );
 }

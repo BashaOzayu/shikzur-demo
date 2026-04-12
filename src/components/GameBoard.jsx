@@ -3,7 +3,6 @@ import TileBank from "./TileBank";
 import DropZone from "./DropZone";
 import "./GameBoard.css";
 import { useTileSound } from "../hooks/useAudio";
-import LetterChart from "./LetterChart";
 
 function playAudio(src, volume = 0.7) {
   const audio = new Audio(src);
@@ -31,14 +30,21 @@ function shuffle(arr) {
   return a;
 }
 
-export default function GameBoard({ fragment, levelIndex, totalLevels, onComplete, sfxMuted, sfxVolume }) {
+export default function GameBoard({
+  fragment,
+  levelIndex,
+  totalLevels,
+  onComplete,
+  sfxMuted,
+  sfxVolume,
+  onOpenChart = () => {},
+}) {
   const [slots, setSlots] = useState([]);         // array of tile|null per slot
   const [bankTiles, setBankTiles] = useState([]); // tiles still in bank
   const [shaking, setShaking] = useState(null);   // tile id currently shaking
   const [completed, setCompleted] = useState(false);
   const [dragging, setDragging] = useState(null); // { tileId, source: 'bank'|slotIndex }
   const playTileSound = useTileSound("/sounds/tilesound.mp3", sfxMuted, sfxVolume);
-  const [chartOpen, setChartOpen] = useState(false);
 
   // Reset state when fragment changes
   useEffect(() => {
@@ -233,7 +239,7 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
     >
       <button
         aria-label="Open letter reference"
-        onClick={() => setChartOpen(true)}
+        onClick={onOpenChart}
         style={{
           position: "absolute",
           top: 0,
@@ -345,7 +351,6 @@ export default function GameBoard({ fragment, levelIndex, totalLevels, onComplet
           <span className="completion-sub">Fragment restored</span>
         </div>
       )}
-      <LetterChart isOpen={chartOpen} onClose={() => setChartOpen(false)} />
     </div>
   );
 }

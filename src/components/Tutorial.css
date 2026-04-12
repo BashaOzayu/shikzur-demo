@@ -489,3 +489,32 @@
   color: var(--bronze-light);
 }
 
+.chart-highlight-pulse {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.chart-pulse-ring {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 2px;
+  border: 2px solid var(--bronze-glow);
+  animation: pulseRing 1.2s ease-out infinite;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
