@@ -151,71 +151,51 @@ const slides = [
   {
     id: 14,
     type: "puzzle",
-    title: "Place Ta",
+    title: "Transcribe Kitab",
     narration:
-      "Ta is in the middle of the word, between the initial and the final. Anything in between is considered a medial form. Find the letter Ta and drag it into its correct spot.",
+      "Now, let's transcribe the word Kitab together. Drag each letter into its correct position, from right to left.",
     word: "كِتَاب",
     romanization: "kitab",
     fragment: "fragment_1.png",
-    slots: [
-      { letter: "ك", name: "kaf", locked: true },
-      { letter: "ت", name: "ta", locked: false, target: true },
-      { letter: "ا", name: "alif", locked: false, target: false },
-      { letter: "ب", name: "ba", locked: false, target: false },
+    steps: [
+      {
+        targetSlot: 1,
+        targetTileId: "ta_tutorial",
+        lockedSlots: [0],
+        bankTiles: [
+          { id: "ta_tutorial", file: "tile_ta.png", letter: "ت", name: "ta" },
+          { id: "alif_tutorial", file: "tile_alif.png", letter: "ا", name: "alif" },
+          { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba" },
+          { id: "decoy_sin", file: "tile_sin.png", letter: "س", name: "seen" },
+        ],
+      },
+      {
+        targetSlot: 2,
+        targetTileId: "alif_tutorial",
+        lockedSlots: [0, 1],
+        bankTiles: [
+          { id: "alif_tutorial", file: "tile_alif.png", letter: "ا", name: "alif" },
+          { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba" },
+          { id: "decoy_mim", file: "tile_mim.png", letter: "م", name: "meem" },
+        ],
+      },
+      {
+        targetSlot: 3,
+        targetTileId: "ba_tutorial",
+        lockedSlots: [0, 1, 2],
+        bankTiles: [
+          { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba" },
+          { id: "decoy_dal", file: "tile_dal.png", letter: "د", name: "dal" },
+          { id: "decoy_ra", file: "tile_ra.png", letter: "ر", name: "ra" },
+        ],
+      },
     ],
-    bankTiles: [
-      { id: "ta_tutorial", file: "tile_ta.png", letter: "ت", name: "ta", correct: true },
-      { id: "alif_tutorial", file: "tile_alif.png", letter: "ا", name: "alif", correct: false },
-      { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba", correct: false },
-      { id: "decoy_sin", file: "tile_sin.png", letter: "س", name: "seen", correct: false },
+    allSlots: [
+      { letter: "ك", name: "kaf" },
+      { letter: "ت", name: "ta" },
+      { letter: "ا", name: "alif" },
+      { letter: "ب", name: "ba" },
     ],
-    targetTile: "ta_tutorial",
-    targetSlot: 1,
-  },
-  {
-    id: 15,
-    type: "puzzle",
-    title: "Try Alif",
-    narration: "Try Alif.",
-    word: "كِتَاب",
-    romanization: "kitab",
-    fragment: "fragment_1.png",
-    slots: [
-      { letter: "ك", name: "kaf", locked: true },
-      { letter: "ت", name: "ta", locked: true },
-      { letter: "ا", name: "alif", locked: false, target: true },
-      { letter: "ب", name: "ba", locked: false, target: false },
-    ],
-    bankTiles: [
-      { id: "alif_tutorial", file: "tile_alif.png", letter: "ا", name: "alif", correct: true },
-      { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba", correct: false },
-      { id: "decoy_mim", file: "tile_mim.png", letter: "م", name: "meem", correct: false },
-    ],
-    targetTile: "alif_tutorial",
-    targetSlot: 2,
-  },
-  {
-    id: 16,
-    type: "puzzle",
-    title: "Place Ba",
-    narration:
-      "Ba is the last letter of this word. Which form is it in? That's correct, its final form. Find the tile Ba and drag it into the last spot.",
-    word: "كِتَاب",
-    romanization: "kitab",
-    fragment: "fragment_1.png",
-    slots: [
-      { letter: "ك", name: "kaf", locked: true },
-      { letter: "ت", name: "ta", locked: true },
-      { letter: "ا", name: "alif", locked: true },
-      { letter: "ب", name: "ba", locked: false, target: true },
-    ],
-    bankTiles: [
-      { id: "ba_tutorial", file: "tile_ba.png", letter: "ب", name: "ba", correct: true },
-      { id: "decoy_dal", file: "tile_dal.png", letter: "د", name: "dal", correct: false },
-      { id: "decoy_ra", file: "tile_ra.png", letter: "ر", name: "ra", correct: false },
-    ],
-    targetTile: "ba_tutorial",
-    targetSlot: 3,
   },
   {
     id: 16.5,
@@ -242,22 +222,26 @@ const slides = [
   },
 ];
 
-const PLACE_TA_SLIDE_INDEX = slides.findIndex((s) => s.title === "Place Ta");
+const TRANSCRIBE_KITAB_SLIDE_INDEX = slides.findIndex((s) => s.title === "Transcribe Kitab");
 
 export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [interactionComplete, setInteractionComplete] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [shaking, setShaking] = useState(null);
-  const [puzzleComplete, setPuzzleComplete] = useState(false);
+  const [puzzleStep, setPuzzleStep] = useState(0);
+  const [tilesGreyed, setTilesGreyed] = useState(false);
+  const [placedTileIds, setPlacedTileIds] = useState([]);
   const [touchDrag, setTouchDrag] = useState(null);
   const [dragging, setDragging] = useState(null);
   const [tutorialBgLoaded, setTutorialBgLoaded] = useState(false);
   const [litLetters, setLitLetters] = useState([]);
   const [chartHighlighted, setChartHighlighted] = useState(false);
   const chartOpenedRef = useRef(false);
+  const tilesGreyedRef = useRef(false);
   const touchDragRef = useRef(null);
   touchDragRef.current = touchDrag;
+  tilesGreyedRef.current = tilesGreyed;
 
   useEffect(() => {
     let cancelled = false;
@@ -289,7 +273,10 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
     setInteractionComplete(false);
     setSelectedOption(null);
     setShaking(null);
-    setPuzzleComplete(false);
+    setPuzzleStep(0);
+    setTilesGreyed(false);
+    tilesGreyedRef.current = false;
+    setPlacedTileIds([]);
     setDragging(null);
     setTouchDrag(null);
     setLitLetters([]);
@@ -299,7 +286,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
 
   useEffect(() => {
     const slide = slides[currentSlide];
-    if (slide.title === "Place Ta" && !chartOpenedRef.current) {
+    if (slide.title === "Transcribe Kitab" && !chartOpenedRef.current) {
       chartOpenedRef.current = true;
       setChartHighlighted(true);
       const timer = setTimeout(() => {
@@ -388,7 +375,32 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
 
   function handleContinue() {
     const s = slides[currentSlide];
-    if ((s.type === "choice" || s.type === "puzzle") && !interactionComplete) return;
+
+    if (s.type === "puzzle") {
+      if (!interactionComplete) return;
+
+      const isLastStep = puzzleStep >= s.steps.length - 1;
+
+      if (!isLastStep) {
+        setPuzzleStep((p) => p + 1);
+        setTilesGreyed(false);
+        tilesGreyedRef.current = false;
+        setInteractionComplete(false);
+        setDragging(null);
+        setShaking(null);
+      } else {
+        setPuzzleStep(0);
+        setTilesGreyed(false);
+        tilesGreyedRef.current = false;
+        setInteractionComplete(false);
+        setPlacedTileIds([]);
+        setCurrentSlide((i) => i + 1);
+      }
+      return;
+    }
+
+    if (s.type === "choice" && !interactionComplete) return;
+
     if (currentSlide < slides.length - 1) {
       setCurrentSlide((i) => i + 1);
     } else {
@@ -421,22 +433,29 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
 
   function handlePuzzleDrop(slotIndex) {
     if (!dragging) return;
-    const s = slides[currentSlide];
-    if (s.type !== "puzzle") return;
-    const isCorrectTile = dragging === s.targetTile;
-    const isCorrectSlot = Number(slotIndex) === s.targetSlot;
+    const slide = slides[currentSlide];
+    if (slide.type !== "puzzle") return;
+    if (tilesGreyedRef.current) return;
+
+    const step = slide.steps[puzzleStep];
+    const isCorrectTile = dragging === step.targetTileId;
+    const isCorrectSlot = slotIndex === step.targetSlot;
 
     if (isCorrectTile && isCorrectSlot) {
-      setPuzzleComplete(true);
-      setInteractionComplete(true);
+      setPlacedTileIds((prev) => [...prev, step.targetTileId]);
+      setTilesGreyed(true);
+      tilesGreyedRef.current = true;
       setDragging(null);
+
+      playAudio(`/sounds/reward_0${Math.ceil(Math.random() * 3)}.mp3`, sfxVolume ?? 0.7);
+
+      setInteractionComplete(true);
     } else {
       setShaking(dragging);
       setTimeout(() => setShaking(null), 500);
       setDragging(null);
-      if (!sfxMuted) {
-        playAudio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`, sfxVolume ?? 0.7);
-      }
+
+      playAudio(`/sounds/mistake_0${Math.ceil(Math.random() * 4)}.mp3`, sfxVolume ?? 0.7);
     }
   }
 
@@ -473,7 +492,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
     if (!d) return;
     const el = document.elementFromPoint(d.x, d.y);
     const slotEl = el?.closest("[data-tutorial-slot]");
-    if (slotEl) {
+    if (slotEl && !tilesGreyedRef.current) {
       handlePuzzleDrop(parseInt(slotEl.dataset.tutorialSlot, 10));
     } else {
       setDragging(null);
@@ -569,113 +588,130 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
   );
 
   const renderPuzzle = () => {
-    const targetBankTile = slide.bankTiles.find((t) => t.id === slide.targetTile);
+    const puzzleSlide = slides[currentSlide];
+    const step = puzzleSlide.steps[puzzleStep];
 
     return (
-    <div
-      className="tutorial-puzzle"
-      onTouchMove={handlePuzzleTouchMove}
-      onTouchEnd={handlePuzzleTouchEnd}
-      style={{ touchAction: "none" }}
-    >
-      {touchDrag && dragging && (() => {
-        const tile = slide.bankTiles?.find((t) => t.id === dragging);
-        if (!tile) return null;
-        return (
-          <div
-            style={{
-              position: "fixed",
-              left: touchDrag.x - 40,
-              top: touchDrag.y - 40,
-              pointerEvents: "none",
-              zIndex: 1000,
-              opacity: 0.9,
-              transform: "scale(1.15)",
-              transition: "none",
-            }}
-          >
-            <img
-              src={`/tiles/${tile.file}`}
-              alt=""
-              width={80}
-              draggable={false}
-              style={{ display: "block" }}
-            />
-          </div>
-        );
-      })()}
-
       <div
-        className="tutorial-fragment"
-        style={{
-          backgroundImage: `url(/tiles/${slide.fragment})`,
-          backgroundSize: "contain",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "center",
-          minHeight: "160px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        className="tutorial-puzzle"
+        onTouchMove={handlePuzzleTouchMove}
+        onTouchEnd={handlePuzzleTouchEnd}
+        style={{ touchAction: "none" }}
       >
-        <p className="tutorial-word-arabic">{slide.word}</p>
-      </div>
-
-      <div className="tutorial-slots" dir="rtl">
-        {slide.slots.map((slot, i) => (
-          <div
-            key={i}
-            className={`tutorial-slot
-            ${slot.locked ? "slot-locked" : ""}
-            ${slot.target && !puzzleComplete ? "slot-target" : ""}
-            ${slot.target && puzzleComplete ? "slot-filled-complete" : ""}
-          `}
-            data-tutorial-slot={i}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={() => handlePuzzleDrop(i)}
-          >
-            {slot.locked && (
-              <img
-                src={`/tiles/tile_${slot.name}.png`}
-                alt={slot.letter}
-                width={64}
-                draggable={false}
-              />
-            )}
-            {slot.target && puzzleComplete && targetBankTile && (
-              <img
-                src={`/tiles/${targetBankTile.file}`}
-                alt={slot.letter}
-                width={64}
-                draggable={false}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="tutorial-bank">
-        {slide.bankTiles
-          .filter((t) => !(puzzleComplete && t.id === slide.targetTile))
-          .map((tile) => (
+        {touchDrag && dragging && (() => {
+          const tile = step.bankTiles?.find((t) => t.id === dragging);
+          if (!tile) return null;
+          return (
             <div
-              key={tile.id}
-              className={`tutorial-bank-tile ${shaking === tile.id ? "option-shake" : ""}`}
-              draggable
-              onDragStart={() => handlePuzzleDragStart(tile.id)}
-              onTouchStart={(e) => handlePuzzleTouchStart(e, tile.id)}
+              style={{
+                position: "fixed",
+                left: touchDrag.x - 40,
+                top: touchDrag.y - 40,
+                pointerEvents: "none",
+                zIndex: 1000,
+                opacity: 0.9,
+                transform: "scale(1.15)",
+                transition: "none",
+              }}
             >
               <img
                 src={`/tiles/${tile.file}`}
-                alt={tile.letter}
-                width={64}
+                alt=""
+                width={80}
                 draggable={false}
+                style={{ display: "block" }}
               />
-              <span className="tile-name-label">{tile.name}</span>
             </div>
-          ))}
+          );
+        })()}
+
+        <div
+          className="tutorial-fragment"
+          style={{
+            backgroundImage: `url(/tiles/${puzzleSlide.fragment})`,
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+            minHeight: "140px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <p className="tutorial-word-arabic" style={{ color: "#1a0a00" }}>
+            {puzzleSlide.word}
+          </p>
+        </div>
+
+        <p
+          style={{
+            fontSize: "0.72rem",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            color: "var(--text-dim)",
+          }}
+        >
+          Step {puzzleStep + 1} of {puzzleSlide.steps.length}
+        </p>
+
+        <div className="tutorial-slots" dir="rtl">
+          {puzzleSlide.allSlots.map((slot, i) => {
+            const isLocked = step.lockedSlots.includes(i);
+            const isTarget = i === step.targetSlot;
+            const isPlaced = placedTileIds.includes(
+              puzzleSlide.steps.find((st) => st.targetSlot === i)?.targetTileId
+            );
+
+            return (
+              <div
+                key={i}
+                className={`tutorial-slot
+                ${isLocked || isPlaced ? "slot-locked" : ""}
+                ${isTarget && !tilesGreyed ? "slot-target" : ""}
+                ${isTarget && tilesGreyed ? "slot-filled-complete" : ""}
+              `}
+                data-tutorial-slot={i}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => !tilesGreyed && handlePuzzleDrop(i)}
+              >
+                {(isLocked || isPlaced) && (
+                  <img
+                    src={`/tiles/tile_${slot.name}.png`}
+                    alt={slot.letter}
+                    width={64}
+                    draggable={false}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="tutorial-bank">
+          {step.bankTiles
+            .filter((tile) => !placedTileIds.includes(tile.id))
+            .map((tile) => (
+              <div
+                key={tile.id}
+                className={`tutorial-bank-tile
+                ${shaking === tile.id ? "option-shake" : ""}
+                ${tilesGreyed ? "tile-greyed" : ""}
+              `}
+                draggable={!tilesGreyed}
+                onDragStart={() => !tilesGreyed && handlePuzzleDragStart(tile.id)}
+                onTouchStart={(e) => !tilesGreyed && handlePuzzleTouchStart(e, tile.id)}
+              >
+                <img
+                  src={`/tiles/${tile.file}`}
+                  alt={tile.letter}
+                  width={64}
+                  draggable={false}
+                />
+                <span className="tile-name-label">{tile.name}</span>
+              </div>
+            ))}
+        </div>
       </div>
-    </div>
     );
   };
 
@@ -724,7 +760,8 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
   return (
     <div className="tutorial-screen" style={{ touchAction: "none" }}>
       {(chartHighlighted ||
-        (PLACE_TA_SLIDE_INDEX !== -1 && currentSlide >= PLACE_TA_SLIDE_INDEX)) && (
+        (TRANSCRIBE_KITAB_SLIDE_INDEX !== -1 &&
+          currentSlide >= TRANSCRIBE_KITAB_SLIDE_INDEX)) && (
         <div
           className="chart-highlight-pulse"
           style={{

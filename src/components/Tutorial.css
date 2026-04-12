@@ -423,6 +423,13 @@
   transform: translateY(-3px);
 }
 
+.tile-greyed {
+  opacity: 0.3;
+  filter: grayscale(80%);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .tile-name-label {
   font-size: 0.72rem;
   color: rgba(200, 184, 122, 0.5);
