@@ -29,7 +29,7 @@ function LoreVideo({ videoRef, onEnded, onSkip }) {
         inset: 0,
         width: "100vw",
         height: "100vh",
-        background: "#000",
+        background: "#0d0d1a",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -41,9 +41,12 @@ function LoreVideo({ videoRef, onEnded, onSkip }) {
         ref={videoRef}
         src="/video/Shikzur_intro.mp4"
         style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
+          width: "90%",
+          maxWidth: "860px",
+          maxHeight: "80vh",
+          objectFit: "contain",
+          borderRadius: "2px",
+          border: "1px solid rgba(168,124,69,0.3)",
         }}
         playsInline
         autoPlay
@@ -54,9 +57,7 @@ function LoreVideo({ videoRef, onEnded, onSkip }) {
         type="button"
         onClick={onSkip}
         style={{
-          position: "absolute",
-          bottom: 32,
-          right: 32,
+          marginTop: "16px",
           background: "rgba(13,13,26,0.7)",
           border: "1px solid rgba(168,124,69,0.4)",
           color: "var(--parchment)",
@@ -65,7 +66,6 @@ function LoreVideo({ videoRef, onEnded, onSkip }) {
           letterSpacing: "0.12em",
           padding: "10px 24px",
           cursor: "pointer",
-          zIndex: 20,
         }}
       >
         Skip →
@@ -165,7 +165,14 @@ const slides = [
 
 const TRANSCRIBE_KITAB_SLIDE_INDEX = slides.findIndex((s) => s.title === "Transcribe Kitab");
 
-export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart }) {
+export default function Tutorial({
+  onComplete,
+  sfxMuted,
+  sfxVolume,
+  onOpenChart,
+  onCloseChart,
+  chartOpen,
+}) {
   const [showVideo, setShowVideo] = useState(true);
   const videoRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -229,7 +236,8 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
 
   useEffect(() => {
     const slide = slides[currentSlide];
-    if (slide.title === "Transcribe Kitab" && !chartOpenedRef.current) {
+
+    if (currentSlide === 0 && !chartOpenedRef.current) {
       chartOpenedRef.current = true;
       setChartHighlighted(true);
       const timer = setTimeout(() => {
@@ -237,7 +245,16 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [currentSlide]);
+
+    if (slide.type === "puzzle" && !chartOpenedRef.current) {
+      chartOpenedRef.current = true;
+      setChartHighlighted(true);
+      const timer = setTimeout(() => {
+        onOpenChart();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [currentSlide, onOpenChart]);
 
   useEffect(() => {
     const slide = slides[currentSlide];
@@ -679,6 +696,29 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
 
   return (
     <div className="tutorial-screen" style={{ touchAction: "none" }}>
+      {!showVideo && (
+        <button
+          type="button"
+          onClick={chartOpen ? onCloseChart : onOpenChart}
+          style={{
+            position: "fixed",
+            top: 12,
+            right: 12,
+            background: "rgba(13,13,26,0.7)",
+            border: "1px solid rgba(168,124,69,0.4)",
+            color: "var(--bronze-light)",
+            padding: "6px 12px",
+            cursor: "pointer",
+            fontSize: "0.78rem",
+            borderRadius: 2,
+            letterSpacing: "0.1em",
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            zIndex: 150,
+          }}
+        >
+          {chartOpen ? "✕ Chart" : "ⓘ Chart"}
+        </button>
+      )}
       {(chartHighlighted ||
         (TRANSCRIBE_KITAB_SLIDE_INDEX !== -1 &&
           currentSlide >= TRANSCRIBE_KITAB_SLIDE_INDEX)) && (

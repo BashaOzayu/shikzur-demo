@@ -59,6 +59,8 @@ export default function App() {
           sfxMuted={sfxMuted}
           sfxVolume={sfxVolume}
           onOpenChart={() => setChartOpen(true)}
+          onCloseChart={() => setChartOpen(false)}
+          chartOpen={chartOpen}
         />
       )}
       {screen === "title" && (
@@ -72,7 +74,9 @@ export default function App() {
           onComplete={handleLevelComplete}
           sfxMuted={sfxMuted}
           sfxVolume={sfxVolume}
+          chartOpen={chartOpen}
           onOpenChart={() => setChartOpen(true)}
+          onCloseChart={() => setChartOpen(false)}
         />
       )}
       {screen === "reward" && (

@@ -37,7 +37,9 @@ export default function GameBoard({
   onComplete,
   sfxMuted,
   sfxVolume,
+  chartOpen = false,
   onOpenChart = () => {},
+  onCloseChart = () => {},
 }) {
   const [slots, setSlots] = useState([]);         // array of tile|null per slot
   const [bankTiles, setBankTiles] = useState([]); // tiles still in bank
@@ -238,23 +240,30 @@ export default function GameBoard({
       style={{ touchAction: "none" }}
     >
       <button
-        aria-label="Open letter reference"
-        onClick={onOpenChart}
+        type="button"
+        aria-label={chartOpen ? "Close letter chart" : "Open letter chart"}
+        onClick={chartOpen ? onCloseChart : onOpenChart}
         style={{
           position: "absolute",
           top: 0,
           right: 0,
-          background: "transparent",
+          background: chartOpen ? "rgba(201,151,58,0.15)" : "transparent",
           border: "1px solid rgba(168,124,69,0.4)",
           color: "var(--bronze-light)",
-          width: 32,
+          width: "auto",
+          padding: "6px 12px",
           height: 32,
           cursor: "pointer",
-          fontSize: "0.85rem",
-          borderRadius: 2
+          fontSize: "0.78rem",
+          borderRadius: 2,
+          letterSpacing: "0.1em",
+          fontFamily: "'Cormorant Garamond', Georgia, serif",
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
         }}
       >
-        ⓘ
+        {chartOpen ? "✕ Chart" : "ⓘ Chart"}
       </button>
       {/* Touch drag ghost */}
       {touchDrag && dragging && (
