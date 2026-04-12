@@ -220,8 +220,28 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
   const [puzzleComplete, setPuzzleComplete] = useState(false);
   const [touchDrag, setTouchDrag] = useState(null);
   const [dragging, setDragging] = useState(null);
+  const [tutorialBgLoaded, setTutorialBgLoaded] = useState(false);
   const touchDragRef = useRef(null);
   touchDragRef.current = touchDrag;
+
+  useEffect(() => {
+    let cancelled = false;
+    setTutorialBgLoaded(false);
+    const bgImage = `/tiles/tutorial_bg_${String(currentSlide + 1).padStart(2, "0")}.png`;
+    const img = new Image();
+    img.onload = () => {
+      if (!cancelled) setTutorialBgLoaded(true);
+    };
+    img.onerror = () => {
+      if (!cancelled) setTutorialBgLoaded(false);
+    };
+    img.src = bgImage;
+    return () => {
+      cancelled = true;
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [currentSlide]);
 
   const slide = slides[currentSlide];
 
@@ -437,6 +457,33 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume }) {
         </div>
       );
     }
+    const bgImage = `/tiles/tutorial_bg_${String(currentSlide + 1).padStart(2, "0")}.png`;
+
+    if (tutorialBgLoaded) {
+      return (
+        <div
+          className="tutorial-visual-placeholder"
+          style={{
+            alignSelf: "stretch",
+            width: "100%",
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "rgba(10,8,25,0.45)",
+              borderRadius: "2px",
+            }}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="tutorial-visual-placeholder">
         <p className="tutorial-visual-desc">{slide.visual}</p>
