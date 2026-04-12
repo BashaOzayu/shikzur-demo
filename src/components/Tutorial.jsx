@@ -297,13 +297,13 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
   }, [currentSlide]);
 
   useEffect(() => {
-    const s = slides[currentSlide];
-    if (s.type !== "reveal") return;
+    const slide = slides[currentSlide];
+    if (slide.type !== "reveal") return;
 
     setLitLetters([]);
     const timers = [];
 
-    s.letters.forEach((_, i) => {
+    slide.letters.forEach((_, i) => {
       const timer = setTimeout(() => {
         setLitLetters((prev) => [...prev, i]);
       }, 1000 + i * 1500);
@@ -716,7 +716,10 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
   };
 
   const renderReveal = () => {
-    const rtlOrder = [3, 2, 1, 0];
+    const slide = slides[currentSlide];
+    // Display RTL: Kaf on right, Ba on left visually
+    // But light up in reading order: Kaf(0) → Ta(1) → Alif(2) → Ba(3)
+    const displayOrder = [3, 2, 1, 0]; // Ba, Alif, Ta, Kaf (left to right visually)
 
     return (
       <div className="tutorial-reveal">
@@ -739,7 +742,7 @@ export default function Tutorial({ onComplete, sfxMuted, sfxVolume, onOpenChart 
         </div>
 
         <div className="reveal-letters">
-          {rtlOrder.map((letterIndex) => {
+          {displayOrder.map((letterIndex) => {
             const letter = slide.letters[letterIndex];
             const isLit = litLetters.includes(letterIndex);
             return (
