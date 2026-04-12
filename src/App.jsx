@@ -22,9 +22,10 @@ export default function App() {
   const [musicVolume, setMusicVolume] = useState(0.35);
   const [sfxVolume, setSfxVolume] = useState(0.7);
   const [chartOpen, setChartOpen] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
 
   const currentFragment = fragments[levelIndex];
-  useBackgroundMusic("/sounds/oudmusic.mp3", musicMuted, musicVolume);
+  useBackgroundMusic("/sounds/oudmusic.mp3", musicMuted || videoPlaying, musicVolume);
 
   function handleLevelComplete() {
     setShekels((s) => s + 10);
@@ -61,6 +62,8 @@ export default function App() {
           onOpenChart={() => setChartOpen(true)}
           onCloseChart={() => setChartOpen(false)}
           chartOpen={chartOpen}
+          onVideoStart={() => setVideoPlaying(true)}
+          onVideoEnd={() => setVideoPlaying(false)}
         />
       )}
       {screen === "title" && (

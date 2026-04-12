@@ -67,10 +67,12 @@ export function useTileSound(src, muted, volume) {
     if (mutedRef.current) return;
     const pool = poolRef.current;
     if (!pool.length) return;
-    const audio = pool[poolIndexRef.current % pool.length];
-    poolIndexRef.current++;
-    audio.volume = volumeRef.current;
-    audio.currentTime = 0;
-    audio.play().catch(() => {});
+    setTimeout(() => {
+      const audio = pool[poolIndexRef.current % pool.length];
+      poolIndexRef.current++;
+      audio.volume = volumeRef.current;
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }, 400);
   };
 }

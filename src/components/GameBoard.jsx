@@ -125,8 +125,8 @@ export default function GameBoard({
 
     newSlots[slotIndex] = tileObj;
     setSlots(newSlots);
-    playTileSound();
     setBankTiles(newBank);
+    playTileSound();
     setDragging(null);
     checkComplete(newSlots);
   }

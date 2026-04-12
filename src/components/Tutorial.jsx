@@ -21,7 +21,7 @@ function playAudio(src, volume = 0.7) {
   attempt();
 }
 
-function LoreVideo({ videoRef, onEnded, onSkip }) {
+function LoreVideo({ videoRef, onPlay, onEnded, onSkip }) {
   return (
     <div
       style={{
@@ -50,6 +50,7 @@ function LoreVideo({ videoRef, onEnded, onSkip }) {
         }}
         playsInline
         autoPlay
+        onPlay={onPlay}
         onEnded={onEnded}
       />
 
@@ -172,6 +173,8 @@ export default function Tutorial({
   onOpenChart,
   onCloseChart,
   chartOpen,
+  onVideoStart,
+  onVideoEnd,
 }) {
   const [showVideo, setShowVideo] = useState(true);
   const videoRef = useRef(null);
@@ -236,8 +239,6 @@ export default function Tutorial({
 
   useEffect(() => {
     if (showVideo) return;
-
-    // Only play for first 3 slides
     if (currentSlide > 2) return;
 
     const audioFile = `/sounds/tutorial_${currentSlide + 1}.mp3`;
@@ -248,18 +249,22 @@ export default function Tutorial({
     }
 
     const audio = new Audio(audioFile);
-    audio.volume = 0.8;
+    audio.volume = sfxVolume ?? 0.8;
     audioRef.current = audio;
 
-    audio.play().catch(() => {
-      const playOnTouch = () => {
-        audio.play().catch(() => {});
-        document.removeEventListener("touchstart", playOnTouch);
-      };
-      document.addEventListener("touchstart", playOnTouch, { once: true, passive: true });
-    });
+    const tryPlay = () => {
+      audio.play().catch(() => {
+        document.addEventListener("touchstart", () => {
+          audio.play().catch(() => {});
+        }, { once: true, passive: true });
+      });
+    };
+
+    // Small delay to let iOS audio context unlock after video ends
+    const timer = setTimeout(tryPlay, 400);
 
     return () => {
+      clearTimeout(timer);
       if (audioRef.current) {
         audioRef.current.pause();
       }
@@ -722,8 +727,15 @@ export default function Tutorial({
     return (
       <LoreVideo
         videoRef={videoRef}
-        onEnded={() => setShowVideo(false)}
-        onSkip={() => setShowVideo(false)}
+        onPlay={() => onVideoStart && onVideoStart()}
+        onEnded={() => {
+          onVideoEnd && onVideoEnd();
+          setShowVideo(false);
+        }}
+        onSkip={() => {
+          onVideoEnd && onVideoEnd();
+          setShowVideo(false);
+        }}
       />
     );
   }
