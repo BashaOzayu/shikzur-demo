@@ -76,3 +76,14 @@ export function useTileSound(src, muted, volume) {
     }, 400);
   };
 }
+
+export function playCoinSound(muted, volume) {
+  if (muted) return;
+  const audio = new Audio("/sounds/coin.wav");
+  audio.volume = volume ?? 0.8;
+  audio.play().catch(() => {
+    document.addEventListener("touchstart", () => {
+      audio.play().catch(() => {});
+    }, { once: true, passive: true });
+  });
+}

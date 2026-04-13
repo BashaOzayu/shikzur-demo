@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import "./Market.css";
+import { playCoinSound } from "../hooks/useAudio";
 
 const items = [
   { id: "lantern",  name: "Lantern",        cost: 10, type: "supply", description: "Lights the restored reading hall" },
@@ -8,7 +9,7 @@ const items = [
   { id: "gardener", name: "Gardener",       cost: 8,  type: "worker", description: "Replants the dry courtyard garden" },
 ];
 
-export default function Market({ shekels = 30, onComplete }) {
+export default function Market({ shekels = 30, onComplete, sfxMuted, sfxVolume }) {
   const [balance, setBalance] = useState(shekels);
   const [purchased, setPurchased] = useState(() => new Set());
 
@@ -19,6 +20,7 @@ export default function Market({ shekels = 30, onComplete }) {
     if (isPurchased(item.id) || !canAfford(item.cost)) return;
     setBalance((b) => b - item.cost);
     setPurchased((prev) => new Set(prev).add(item.id));
+    playCoinSound(sfxMuted ?? false, sfxVolume ?? 0.8);
   }
 
   const gridItems = useMemo(() => items, []);

@@ -7,7 +7,7 @@ import CompletionScreen from "./components/CompletionScreen";
 import ShekelsReward from "./components/ShekelsReward";
 import Market from "./components/Market";
 import LetterChart from "./components/LetterChart";
-import { useBackgroundMusic } from "./hooks/useAudio";
+import { useBackgroundMusic, playCoinSound } from "./hooks/useAudio";
 import VolumeToggle from "./components/VolumeToggle";
 import ShekelsHUD from "./components/ShekelsHUD";
 import "./App.css";
@@ -29,6 +29,7 @@ export default function App() {
 
   function handleLevelComplete() {
     setShekels((s) => s + 10);
+    playCoinSound(sfxMuted, sfxVolume);
     setTimeout(() => setScreen("reward"), 600);
   }
 
@@ -96,6 +97,8 @@ export default function App() {
         <Market
           shekels={shekels}
           onComplete={() => setScreen("complete")}
+          sfxMuted={sfxMuted}
+          sfxVolume={sfxVolume}
         />
       )}
       {screen === "complete" && (

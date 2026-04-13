@@ -4,24 +4,6 @@
 export const fragments = [
   {
     id: 1,
-    word: "كِتَاب",
-    romanization: "kitab",
-    meaning: "book",
-    hint: "What the scholars came here to preserve",
-    fragment: "fragment_1.png",
-    tiles: [
-      { id: "kaf",   file: "tile_kaf.png",  letter: "ك", name: "kaf", position: 0 },
-      { id: "ta",    file: "tile_ta.png",   letter: "ت", name: "ta", position: 1 },
-      { id: "alif3", file: "tile_alif.png", letter: "ا", name: "alif", position: 2 },
-      { id: "ba",    file: "tile_ba.png",   letter: "ب", name: "ba", position: 3 },
-    ],
-    decoys: [
-      { id: "decoy_dal", file: "tile_dal.png", letter: "د", name: "dal" },
-      { id: "decoy_mim", file: "tile_mim.png", letter: "م", name: "meem" },
-    ],
-  },
-  {
-    id: 2,
     word: "سَلَام",
     romanization: "salaam",
     meaning: "peace",
@@ -36,7 +18,7 @@ export const fragments = [
     decoys: [],
   },
   {
-    id: 3,
+    id: 2,
     word: "دَرَسَ",
     romanization: "darasa",
     meaning: "to study",
@@ -53,7 +35,7 @@ export const fragments = [
     ],
   },
   {
-    id: 4,
+    id: 3,
     word: "قَلَم",
     romanization: "qalam",
     meaning: "pen",
@@ -70,7 +52,7 @@ export const fragments = [
     ],
   },
   {
-    id: 5,
+    id: 4,
     word: "نُور",
     romanization: "nur",
     meaning: "light",
@@ -87,7 +69,7 @@ export const fragments = [
     ],
   },
   {
-    id: 6,
+    id: 5,
     word: "حِكْمَة",
     romanization: "hikmah",
     meaning: "wisdom",
